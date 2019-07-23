@@ -10,13 +10,13 @@ module Reg_IF_ID
 (
     input  wire            clk,
     input  wire            rst,
-    input  wire            stall,
+    (*mark_debug = "true"*) input  wire            stall,
     input  wire            flush,
     input  wire            clrslot,
 
-    input  wire [`AddrBus] if_pc,
+    (*mark_debug = "true"*) input  wire [`AddrBus] if_pc,
     input  wire [`AddrBus] if_pcp4,
-    input  wire [`DataBus] if_inst,
+    (*mark_debug = "true"*) input  wire [`DataBus] if_inst,
     input  wire [`ExcBus ] if_excp,
     input  wire            id_isbranch,
 

@@ -38,6 +38,7 @@ module soc_up_top(
     input         clk,
 
     //------gpio----------------
+    inout  [15:0] GPIO16_pins,
     output [15:0] led,
     output [1 :0] led_rg0,
     output [1 :0] led_rg1,
@@ -137,16 +138,19 @@ wire [`Lawcache    -1 :0] m0_awcache;
 wire [`Lawprot     -1 :0] m0_awprot;
 wire                      m0_awvalid;
 wire                      m0_awready;
+
 wire [`LID         -1 :0] m0_wid;
 wire [`Lwdata      -1 :0] m0_wdata;
 wire [`Lwstrb      -1 :0] m0_wstrb;
 wire                      m0_wlast;
 wire                      m0_wvalid;
 wire                      m0_wready;
+
 wire [`LID         -1 :0] m0_bid;
 wire [`Lbresp      -1 :0] m0_bresp;
 wire                      m0_bvalid;
 wire                      m0_bready;
+
 wire [`LID         -1 :0] m0_arid;
 wire [`Laraddr     -1 :0] m0_araddr;
 wire [`Larlen      -1 :0] m0_arlen;
@@ -157,6 +161,7 @@ wire [`Larcache    -1 :0] m0_arcache;
 wire [`Larprot     -1 :0] m0_arprot;
 wire                      m0_arvalid;
 wire                      m0_arready;
+
 wire [`LID         -1 :0] m0_rid;
 wire [`Lrdata      -1 :0] m0_rdata;
 wire [`Lrresp      -1 :0] m0_rresp;
@@ -651,7 +656,204 @@ MangoMIPS_Top cpu_mid(
 .m_bready       (m0_bready    )
 );
 
-// AXI_MUX 
+// ------------------------------------- GPIO -------------------------------------
+// ---- AXI4 CROSSBAR
+// -- WIRE NET TYPE
+wire [3 : 0]    s_axi3t4l_awid;
+wire [31 : 0]   s_axi3t4l_awaddr;
+wire [7 : 0]    s_axi3t4l_awlen;
+wire [2 : 0]    s_axi3t4l_awsize;
+wire [1 : 0]    s_axi3t4l_awburst;
+wire [0 : 0]    s_axi3t4l_awlock;
+wire [3 : 0]    s_axi3t4l_awcache;
+wire [2 : 0]    s_axi3t4l_awprot;
+wire [0 : 0]    s_axi3t4l_awvalid;
+wire [0 : 0]    s_axi3t4l_awready;
+
+wire [31 : 0]   s_axi3t4l_wdata;
+wire [3 : 0]    s_axi3t4l_wstrb;
+wire [0 : 0]    s_axi3t4l_wlast;
+wire [0 : 0]    s_axi3t4l_wvalid;
+wire [0 : 0]    s_axi3t4l_wready;
+
+wire [3 : 0]    s_axi3t4l_bid;
+wire [1 : 0]    s_axi3t4l_bresp;
+wire [0 : 0]    s_axi3t4l_bvalid;
+wire [0 : 0]    s_axi3t4l_bready;
+
+wire [3 : 0]    s_axi3t4l_arid;
+wire [31 : 0]   s_axi3t4l_araddr;
+wire [7 : 0]    s_axi3t4l_arlen;
+wire [2 : 0]    s_axi3t4l_arsize;
+wire [1 : 0]    s_axi3t4l_arburst;
+wire [0 : 0]    s_axi3t4l_arlock;
+wire [3 : 0]    s_axi3t4l_arcache;
+wire [2 : 0]    s_axi3t4l_arprot;
+wire [0 : 0]    s_axi3t4l_arvalid;
+wire [0 : 0]    s_axi3t4l_arready;
+
+wire [3 : 0]    s_axi3t4l_rid;
+wire [31 : 0]   s_axi3t4l_rdata;
+wire [1 : 0]    s_axi3t4l_rresp;
+wire [0 : 0]    s_axi3t4l_rlast;
+wire [0 : 0]    s_axi3t4l_rvalid;
+wire [0 : 0]    s_axi3t4l_rready;
+
+// ---- GPIO
+// -- WIRE NET TYOPE
+wire [8:0]  single_gpio_awaddr;
+wire        single_gpio_awvalid;
+wire        single_gpio_awready;
+
+wire [31:0] single_gpio_wdata;
+wire [3:0]  single_gpio_wstrb;
+wire        single_gpio_wvalid;
+wire        single_gpio_wready;
+
+wire [1:0]  single_gpio_bresp;
+wire        single_gpio_bvalid;
+wire        single_gpio_bready;
+
+wire [8:0]  single_gpio_araddr;
+wire        single_gpio_arvalid;
+wire        single_gpio_arready;
+
+wire [31:0] single_gpio_rdata;
+wire [1:0]  single_gpio_rresp;
+wire        single_gpio_rvalid;
+wire        single_gpio_rready;
+
+wire [15:0] single_gpio_io_o;
+wire [15:0] single_gpio_io_i;
+wire [15:0] single_gpio_io_t;
+
+generate
+    genvar gpio_itr;
+    for(gpio_itr = 0; gpio_itr < 16; gpio_itr = gpio_itr + 1)
+    begin: gpio_inout_assign
+        assign GPIO16_pins[gpio_itr] = single_gpio_io_t[gpio_itr] ? 1'bz : single_gpio_io_o[gpio_itr];
+        assign single_gpio_io_i[gpio_itr] = GPIO16_pins[gpio_itr];
+    end
+endgenerate
+
+// -- Crossbar IP Core
+axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
+  .aclk(aclk),                      // input wire aclk
+  .aresetn(aresetn),                // input wire aresetn
+  
+  // Slave interface, connected to the father crossbar Master Interface.
+  // Write Address Channel
+  .s_axi_awid       (s_axi3t4l_awid     ),
+  .s_axi_awaddr     (s_axi3t4l_awaddr   ),
+  .s_axi_awlen      (s_axi3t4l_awlen    ),
+  .s_axi_awsize     (s_axi3t4l_awsize   ),
+  .s_axi_awburst    (s_axi3t4l_awburst  ),
+  .s_axi_awlock     (s_axi3t4l_awlock   ),
+  .s_axi_awcache    (s_axi3t4l_awcache  ),
+  .s_axi_awprot     (s_axi3t4l_awprot   ),
+  .s_axi_awqos      (4'b0               ),
+  .s_axi_awvalid    (s_axi3t4l_awvalid  ),
+  .s_axi_awready    (s_axi3t4l_awready  ),
+  
+  // Write Data Channel
+  .s_axi_wdata      (s_axi3t4l_wdata    ),
+  .s_axi_wstrb      (s_axi3t4l_wstrb    ),
+  .s_axi_wlast      (s_axi3t4l_wlast    ),
+  .s_axi_wvalid     (s_axi3t4l_wvalid   ),
+  .s_axi_wready     (s_axi3t4l_wready   ),
+  
+  // Write Response Channel
+  .s_axi_bid        (s_axi3t4l_bid      ),
+  .s_axi_bresp      (s_axi3t4l_bresp    ),
+  .s_axi_bvalid     (s_axi3t4l_bvalid   ),
+  .s_axi_bready     (s_axi3t4l_bready   ),
+  
+  // Read Address Channel
+  .s_axi_arid       (s_axi3t4l_arid     ),
+  .s_axi_araddr     (s_axi3t4l_araddr   ),
+  .s_axi_arlen      (s_axi3t4l_arlen    ),
+  .s_axi_arsize     (s_axi3t4l_arsize   ),
+  .s_axi_arburst    (s_axi3t4l_arburst  ),
+  .s_axi_arlock     (s_axi3t4l_arlock   ),
+  .s_axi_arcache    (s_axi3t4l_arcache  ),
+  .s_axi_arprot     (s_axi3t4l_arprot   ),
+  .s_axi_arqos      (4'b0               ),
+  .s_axi_arvalid    (s_axi3t4l_arvalid  ),
+  .s_axi_arready    (s_axi3t4l_arready  ),
+  
+  // Read Data Channel
+  .s_axi_rid        (s_axi3t4l_rid      ),
+  .s_axi_rdata      (s_axi3t4l_rdata    ),
+  .s_axi_rresp      (s_axi3t4l_rresp    ),
+  .s_axi_rlast      (s_axi3t4l_rlast    ),
+  .s_axi_rvalid     (s_axi3t4l_rvalid   ),
+  .s_axi_rready     (s_axi3t4l_rready   ),
+
+  // Master Interface, connected to the AXI4LITE GPIO IP core.
+  .m_axi_awaddr     ({single_gpio_awaddr    }),
+  .m_axi_awlen      (),
+  .m_axi_awsize     (),
+  .m_axi_awburst    (),
+  .m_axi_awlock     (),
+  .m_axi_awcache    (),
+  .m_axi_awprot     (),
+  .m_axi_awregion   (),
+  .m_axi_awqos      (),
+  .m_axi_awvalid    ({single_gpio_awvalid   }),
+  .m_axi_awready    ({single_gpio_awready   }),
+  .m_axi_wdata      ({single_gpio_wdata     }),
+  .m_axi_wstrb      ({single_gpio_wstrb     }),
+  .m_axi_wlast      (),
+  .m_axi_wvalid     ({single_gpio_wvalid    }),
+  .m_axi_wready     ({single_gpio_wready    }),
+  .m_axi_bresp      ({single_gpio_bresp     }),
+  .m_axi_bvalid     ({single_gpio_bvalid    }),
+  .m_axi_bready     ({single_gpio_bready    }),
+  .m_axi_araddr     ({single_gpio_araddr    }),
+  .m_axi_arlen      (),
+  .m_axi_arsize     (),
+  .m_axi_arburst    (),
+  .m_axi_arlock     (),
+  .m_axi_arcache    (),
+  .m_axi_arprot     (),
+  .m_axi_arregion   (),
+  .m_axi_arqos      (),
+  .m_axi_arvalid    ({single_gpio_arvalid   }),
+  .m_axi_arready    ({single_gpio_arready   }),
+  .m_axi_rdata      ({single_gpio_rdata     }),
+  .m_axi_rresp      ({single_gpio_rresp     }),
+  .m_axi_rlast      ({single_gpio_rvalid    }),
+  .m_axi_rvalid     ({single_gpio_rvalid    }),
+  .m_axi_rready     ({single_gpio_rready    })
+);
+
+// -- AXI4 LITE GPIO IO Core
+axi_gpio_0 single_gpio_0 (
+  .s_axi_aclk       (aclk                ),
+  .s_axi_aresetn    (aresetn             ),
+  .s_axi_awaddr     (single_gpio_awaddr  ),
+  .s_axi_awvalid    (single_gpio_awvalid ),
+  .s_axi_awready    (single_gpio_awready ),
+  .s_axi_wdata      (single_gpio_wdata   ),
+  .s_axi_wstrb      (single_gpio_wstrb   ),
+  .s_axi_wvalid     (single_gpio_wvalid  ),
+  .s_axi_wready     (single_gpio_wready  ),
+  .s_axi_bresp      (single_gpio_bresp   ),
+  .s_axi_bvalid     (single_gpio_bvalid  ),
+  .s_axi_bready     (single_gpio_bready  ),
+  .s_axi_araddr     (single_gpio_araddr  ),
+  .s_axi_arvalid    (single_gpio_arvalid ),
+  .s_axi_arready    (single_gpio_arready ),
+  .s_axi_rdata      (single_gpio_rdata   ),
+  .s_axi_rresp      (single_gpio_rresp   ),
+  .s_axi_rvalid     (single_gpio_rvalid  ),
+  .s_axi_rready     (single_gpio_rready  ),
+  .gpio_io_i        (single_gpio_io_i    ),
+  .gpio_io_o        (single_gpio_io_o    ),
+  .gpio_io_t        (single_gpio_io_t    )
+);
+
+// ------------------------------------- TOP AXI3 Crossbar -------------------------------------
 axi_crossbar_soc AXI_Crossbar_SoC (
     .aclk           (aclk       ),
     .aresetn        (aresetn    ),
@@ -694,44 +896,48 @@ axi_crossbar_soc AXI_Crossbar_SoC (
     .s_axi_rvalid   (m0_rvalid  ),
     .s_axi_rready   (m0_rready  ),
     
-    .m_axi_awid     ({gpu_s_awid,     mac_s_awid,     conf_s_awid,     apb_s_awid,     spi_s_awid,     s0_awid     }),
-    .m_axi_awaddr   ({gpu_s_awaddr,   mac_s_awaddr,   conf_s_awaddr,   apb_s_awaddr,   spi_s_awaddr,   s0_awaddr   }),
-    .m_axi_awlen    ({gpu_s_awlen,    mac_s_awlen,    conf_s_awlen,    apb_s_awlen,    spi_s_awlen,    s0_awlen    }),
-    .m_axi_awsize   ({gpu_s_awsize,   mac_s_awsize,   conf_s_awsize,   apb_s_awsize,   spi_s_awsize,   s0_awsize   }),
-    .m_axi_awburst  ({gpu_s_awburst,  mac_s_awburst,  conf_s_awburst,  apb_s_awburst,  spi_s_awburst,  s0_awburst  }),
-    .m_axi_awlock   ({gpu_s_awlock,   mac_s_awlock,   conf_s_awlock,   apb_s_awlock,   spi_s_awlock,   s0_awlock   }),
-    .m_axi_awcache  ({gpu_s_awcache,  mac_s_awcache,  conf_s_awcache,  apb_s_awcache,  spi_s_awcache,  s0_awcache  }),
-    .m_axi_awprot   ({gpu_s_awprot,   mac_s_awprot,   conf_s_awprot,   apb_s_awprot,   spi_s_awprot,   s0_awprot   }),
-    .m_axi_awqos    (                                                                                               ),
-    .m_axi_awvalid  ({gpu_s_awvalid,  mac_s_awvalid,  conf_s_awvalid,  apb_s_awvalid,  spi_s_awvalid,  s0_awvalid  }),
-    .m_axi_awready  ({gpu_s_awready,  mac_s_awready,  conf_s_awready,  apb_s_awready,  spi_s_awready,  s0_awready  }),
-    .m_axi_wid      ({gpu_s_wid,      mac_s_wid,      conf_s_wid,      apb_s_wid,      spi_s_wid,      s0_wid      }),
-    .m_axi_wdata    ({gpu_s_wdata,    mac_s_wdata,    conf_s_wdata,    apb_s_wdata,    spi_s_wdata,    s0_wdata    }),
-    .m_axi_wstrb    ({gpu_s_wstrb,    mac_s_wstrb,    conf_s_wstrb,    apb_s_wstrb,    spi_s_wstrb,    s0_wstrb    }),
-    .m_axi_wlast    ({gpu_s_wlast,    mac_s_wlast,    conf_s_wlast,    apb_s_wlast,    spi_s_wlast,    s0_wlast    }),
-    .m_axi_wvalid   ({gpu_s_wvalid,   mac_s_wvalid,   conf_s_wvalid,   apb_s_wvalid,   spi_s_wvalid,   s0_wvalid   }),
-    .m_axi_wready   ({gpu_s_wready,   mac_s_wready,   conf_s_wready,   apb_s_wready,   spi_s_wready,   s0_wready   }),
-    .m_axi_bid      ({gpu_s_bid,      mac_s_bid,      conf_s_bid,      apb_s_bid,      spi_s_bid,      s0_bid      }),
-    .m_axi_bresp    ({gpu_s_bresp,    mac_s_bresp,    conf_s_bresp,    apb_s_bresp,    spi_s_bresp,    s0_bresp    }),
-    .m_axi_bvalid   ({gpu_s_bvalid,   mac_s_bvalid,   conf_s_bvalid,   apb_s_bvalid,   spi_s_bvalid,   s0_bvalid   }),
-    .m_axi_bready   ({gpu_s_bready,   mac_s_bready,   conf_s_bready,   apb_s_bready,   spi_s_bready,   s0_bready   }),
-    .m_axi_arid     ({gpu_s_arid,     mac_s_arid,     conf_s_arid,     apb_s_arid,     spi_s_arid,     s0_arid     }),
-    .m_axi_araddr   ({gpu_s_araddr,   mac_s_araddr,   conf_s_araddr,   apb_s_araddr,   spi_s_araddr,   s0_araddr   }),
-    .m_axi_arlen    ({gpu_s_arlen,    mac_s_arlen,    conf_s_arlen,    apb_s_arlen,    spi_s_arlen,    s0_arlen    }),
-    .m_axi_arsize   ({gpu_s_arsize,   mac_s_arsize,   conf_s_arsize,   apb_s_arsize,   spi_s_arsize,   s0_arsize   }),
-    .m_axi_arburst  ({gpu_s_arburst,  mac_s_arburst,  conf_s_arburst,  apb_s_arburst,  spi_s_arburst,  s0_arburst  }),
-    .m_axi_arlock   ({gpu_s_arlock,   mac_s_arlock,   conf_s_arlock,   apb_s_arlock,   spi_s_arlock,   s0_arlock   }),
-    .m_axi_arcache  ({gpu_s_arcache,  mac_s_arcache,  conf_s_arcache,  apb_s_arcache,  spi_s_arcache,  s0_arcache  }),
-    .m_axi_arprot   ({gpu_s_arprot,   mac_s_arprot,   conf_s_arprot,   apb_s_arprot,   spi_s_arprot,   s0_arprot   }),
-    .m_axi_arqos    (                                                                                               ),
-    .m_axi_arvalid  ({gpu_s_arvalid,  mac_s_arvalid,  conf_s_arvalid,  apb_s_arvalid,  spi_s_arvalid,  s0_arvalid  }),
-    .m_axi_arready  ({gpu_s_arready,  mac_s_arready,  conf_s_arready,  apb_s_arready,  spi_s_arready,  s0_arready  }),
-    .m_axi_rid      ({gpu_s_rid,      mac_s_rid,      conf_s_rid,      apb_s_rid,      spi_s_rid,      s0_rid      }),
-    .m_axi_rdata    ({gpu_s_rdata,    mac_s_rdata,    conf_s_rdata,    apb_s_rdata,    spi_s_rdata,    s0_rdata    }),
-    .m_axi_rresp    ({gpu_s_rresp,    mac_s_rresp,    conf_s_rresp,    apb_s_rresp,    spi_s_rresp,    s0_rresp    }),
-    .m_axi_rlast    ({gpu_s_rlast,    mac_s_rlast,    conf_s_rlast,    apb_s_rlast,    spi_s_rlast,    s0_rlast    }),
-    .m_axi_rvalid   ({gpu_s_rvalid,   mac_s_rvalid,   conf_s_rvalid,   apb_s_rvalid,   spi_s_rvalid,   s0_rvalid   }),
-    .m_axi_rready   ({gpu_s_rready,   mac_s_rready,   conf_s_rready,   apb_s_rready,   spi_s_rready,   s0_rready   })
+    .m_axi_awid     ({s_axi3t4l_awid,       gpu_s_awid,     mac_s_awid,     conf_s_awid,     apb_s_awid,     spi_s_awid,     s0_awid     }),
+    .m_axi_awaddr   ({s_axi3t4l_awaddr,     gpu_s_awaddr,   mac_s_awaddr,   conf_s_awaddr,   apb_s_awaddr,   spi_s_awaddr,   s0_awaddr   }),
+    .m_axi_awlen    ({s_axi3t4l_awlen,      gpu_s_awlen,    mac_s_awlen,    conf_s_awlen,    apb_s_awlen,    spi_s_awlen,    s0_awlen    }),
+    .m_axi_awsize   ({s_axi3t4l_awsize,     gpu_s_awsize,   mac_s_awsize,   conf_s_awsize,   apb_s_awsize,   spi_s_awsize,   s0_awsize   }),
+    .m_axi_awburst  ({s_axi3t4l_awburst,    gpu_s_awburst,  mac_s_awburst,  conf_s_awburst,  apb_s_awburst,  spi_s_awburst,  s0_awburst  }),
+    .m_axi_awlock   ({s_axi3t4l_awlock,     gpu_s_awlock,   mac_s_awlock,   conf_s_awlock,   apb_s_awlock,   spi_s_awlock,   s0_awlock   }),
+    .m_axi_awcache  ({s_axi3t4l_awcache,    gpu_s_awcache,  mac_s_awcache,  conf_s_awcache,  apb_s_awcache,  spi_s_awcache,  s0_awcache  }),
+    .m_axi_awprot   ({s_axi3t4l_awprot,     gpu_s_awprot,   mac_s_awprot,   conf_s_awprot,   apb_s_awprot,   spi_s_awprot,   s0_awprot   }),
+    .m_axi_awqos    (),
+    .m_axi_awvalid  ({s_axi3t4l_awvalid,    gpu_s_awvalid,  mac_s_awvalid,  conf_s_awvalid,  apb_s_awvalid,  spi_s_awvalid,  s0_awvalid  }),
+    .m_axi_awready  ({s_axi3t4l_awready,    gpu_s_awready,  mac_s_awready,  conf_s_awready,  apb_s_awready,  spi_s_awready,  s0_awready  }),
+    
+    .m_axi_wid      ({                      gpu_s_wid,      mac_s_wid,      conf_s_wid,      apb_s_wid,      spi_s_wid,      s0_wid      }),
+    .m_axi_wdata    ({s_axi3t4l_wdata,      gpu_s_wdata,    mac_s_wdata,    conf_s_wdata,    apb_s_wdata,    spi_s_wdata,    s0_wdata    }),
+    .m_axi_wstrb    ({s_axi3t4l_wstrb,      gpu_s_wstrb,    mac_s_wstrb,    conf_s_wstrb,    apb_s_wstrb,    spi_s_wstrb,    s0_wstrb    }),
+    .m_axi_wlast    ({s_axi3t4l_wlast,      gpu_s_wlast,    mac_s_wlast,    conf_s_wlast,    apb_s_wlast,    spi_s_wlast,    s0_wlast    }),
+    .m_axi_wvalid   ({s_axi3t4l_wvalid,     gpu_s_wvalid,   mac_s_wvalid,   conf_s_wvalid,   apb_s_wvalid,   spi_s_wvalid,   s0_wvalid   }),
+    .m_axi_wready   ({s_axi3t4l_wready,     gpu_s_wready,   mac_s_wready,   conf_s_wready,   apb_s_wready,   spi_s_wready,   s0_wready   }),
+    
+    .m_axi_bid      ({s_axi3t4l_bid,        gpu_s_bid,      mac_s_bid,      conf_s_bid,      apb_s_bid,      spi_s_bid,      s0_bid      }),
+    .m_axi_bresp    ({s_axi3t4l_bresp,      gpu_s_bresp,    mac_s_bresp,    conf_s_bresp,    apb_s_bresp,    spi_s_bresp,    s0_bresp    }),
+    .m_axi_bvalid   ({s_axi3t4l_bvalid,     gpu_s_bvalid,   mac_s_bvalid,   conf_s_bvalid,   apb_s_bvalid,   spi_s_bvalid,   s0_bvalid   }),
+    .m_axi_bready   ({s_axi3t4l_bready,     gpu_s_bready,   mac_s_bready,   conf_s_bready,   apb_s_bready,   spi_s_bready,   s0_bready   }),
+    
+    .m_axi_arid     ({s_axi3t4l_arid,       gpu_s_arid,     mac_s_arid,     conf_s_arid,     apb_s_arid,     spi_s_arid,     s0_arid     }),
+    .m_axi_araddr   ({s_axi3t4l_araddr,     gpu_s_araddr,   mac_s_araddr,   conf_s_araddr,   apb_s_araddr,   spi_s_araddr,   s0_araddr   }),
+    .m_axi_arlen    ({s_axi3t4l_arlen,      gpu_s_arlen,    mac_s_arlen,    conf_s_arlen,    apb_s_arlen,    spi_s_arlen,    s0_arlen    }),
+    .m_axi_arsize   ({s_axi3t4l_arsize,     gpu_s_arsize,   mac_s_arsize,   conf_s_arsize,   apb_s_arsize,   spi_s_arsize,   s0_arsize   }),
+    .m_axi_arburst  ({s_axi3t4l_arburst,    gpu_s_arburst,  mac_s_arburst,  conf_s_arburst,  apb_s_arburst,  spi_s_arburst,  s0_arburst  }),
+    .m_axi_arlock   ({s_axi3t4l_arlock,     gpu_s_arlock,   mac_s_arlock,   conf_s_arlock,   apb_s_arlock,   spi_s_arlock,   s0_arlock   }),
+    .m_axi_arcache  ({s_axi3t4l_arcache,    gpu_s_arcache,  mac_s_arcache,  conf_s_arcache,  apb_s_arcache,  spi_s_arcache,  s0_arcache  }),
+    .m_axi_arprot   ({s_axi3t4l_arprot,     gpu_s_arprot,   mac_s_arprot,   conf_s_arprot,   apb_s_arprot,   spi_s_arprot,   s0_arprot   }),
+    .m_axi_arqos    (),
+    .m_axi_arvalid  ({s_axi3t4l_arvalid,    gpu_s_arvalid,  mac_s_arvalid,  conf_s_arvalid,  apb_s_arvalid,  spi_s_arvalid,  s0_arvalid  }),
+    .m_axi_arready  ({s_axi3t4l_arready,    gpu_s_arready,  mac_s_arready,  conf_s_arready,  apb_s_arready,  spi_s_arready,  s0_arready  }),
+    
+    .m_axi_rid      ({s_axi3t4l_rid,        gpu_s_rid,      mac_s_rid,      conf_s_rid,      apb_s_rid,      spi_s_rid,      s0_rid      }),
+    .m_axi_rdata    ({s_axi3t4l_rdata,      gpu_s_rdata,    mac_s_rdata,    conf_s_rdata,    apb_s_rdata,    spi_s_rdata,    s0_rdata    }),
+    .m_axi_rresp    ({s_axi3t4l_rresp,      gpu_s_rresp,    mac_s_rresp,    conf_s_rresp,    apb_s_rresp,    spi_s_rresp,    s0_rresp    }),
+    .m_axi_rlast    ({s_axi3t4l_rlast,      gpu_s_rlast,    mac_s_rlast,    conf_s_rlast,    apb_s_rlast,    spi_s_rlast,    s0_rlast    }),
+    .m_axi_rvalid   ({s_axi3t4l_rvalid,     gpu_s_rvalid,   mac_s_rvalid,   conf_s_rvalid,   apb_s_rvalid,   spi_s_rvalid,   s0_rvalid   }),
+    .m_axi_rready   ({s_axi3t4l_rready,     gpu_s_rready,   mac_s_rready,   conf_s_rready,   apb_s_rready,   spi_s_rready,   s0_rready   })
 );
 
 //SPI

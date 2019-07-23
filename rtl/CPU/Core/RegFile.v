@@ -11,17 +11,17 @@ module RegFile
     input  wire            clk,
     input  wire            rst, 
 
-    input  wire            re1, 
-    input  wire [`RegAddr] r1addr,
-    output reg  [`DataBus] r1data,
+    (*mark_debug = "true"*) input  wire            re1, 
+    (*mark_debug = "true"*) input  wire [`RegAddr] r1addr,
+    (*mark_debug = "true"*) output reg  [`DataBus] r1data,
 
-    input  wire            re2,
-    input  wire [`RegAddr] r2addr,
-    output reg  [`DataBus] r2data,
+    (*mark_debug = "true"*) input  wire            re2,
+    (*mark_debug = "true"*) input  wire [`RegAddr] r2addr,
+    (*mark_debug = "true"*) output reg  [`DataBus] r2data,
 
-    input  wire [`ByteWEn] we,
-    input  wire [`RegAddr] waddr, 
-    input  wire [`DataBus] wdata,
+    (*mark_debug = "true"*) input  wire [`ByteWEn] we,
+    (*mark_debug = "true"*) input  wire [`RegAddr] waddr, 
+    (*mark_debug = "true"*) input  wire [`DataBus] wdata,
 
     input  wire [`ByteWEn] ex_wreg,
     input  wire [`RegAddr] ex_wraddr,

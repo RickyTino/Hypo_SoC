@@ -79,7 +79,7 @@ module DCache_Controller (
     wire wreq    = bus_en &  refs;
 
     // Cached Channel
-    reg             ca_enb;
+    (*mark_debug = "true"*) reg             ca_enb;
     reg  [`ByteWEn] ca_wea,   ca_web;
     reg  [`D_ramad] ca_ada,   ca_adb;
     reg  [`DataBus] ca_dina,  ca_dinb;
@@ -116,7 +116,7 @@ module DCache_Controller (
     wire        uc_hit = (uc_addr ^ bus_addr) == 0 && uc_valid;
     reg         uc_wrdy;
 
-    reg         rw_streq;
+    (*mark_debug = "true"*) reg         rw_streq;
 
     assign bus_streq = rw_streq || ca_enb;
     
@@ -153,7 +153,7 @@ module DCache_Controller (
     reg [ 1: 0] lk_size;
     reg         lk_cached;
     reg [ 3: 0] cnt;
-    reg [ 3: 0] state;
+    (*mark_debug = "true"*) reg [ 3: 0] state;
 
     wire [`D_idx] lk_idx = lk_addr[`D_addr_idx];
     
