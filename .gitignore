@@ -1,10 +1,28 @@
-## vivado temp file
+# Vivado temp file
 vivado_xpr/project_1/project_1.cache/
 vivado_xpr/project_1/project_1.hw/
 vivado_xpr/project_1/project_1.ip_user_files/
 vivado_xpr/project_1/project_1.runs/
 vivado_xpr/project_1/project_1.srcs/
+vivado_xpr/project_1/project_1.sim/
 vivado_xpr/project_1/vivado.jou
 
-## doc
+# Doc
 doc/AXI4L*/
+
+# Xlnx IP Core
+rtl/Xilinx_IP/
+##  MIG
+!rtl/Xilinx_IP/mig_axi_32/*.prj
+!rtl/Xilinx_IP/mig_axi_32/*.xci
+##  GPU RAM
+!rtl/Xilinx_IP/gpu_ram/*.xci
+##  GPU AXI2BRAM
+!rtl/Xilinx_IP/gpu_axi_to_bram/*.xci
+##  DPRAM 512x32
+!rtl/Xilinx_IP/dpram_512x32/*.xci
+##  CLK WIZARD 0
+##  CLK PLL 33
+##  AXI4 LITE CROSSBAR
+##  AXI4 LITE UART Lite
+##  AXI INTERCONNECT
