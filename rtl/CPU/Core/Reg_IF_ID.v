@@ -10,7 +10,7 @@ module Reg_IF_ID
 (
     input  wire            clk,
     input  wire            rst,
-    (*mark_debug = "true"*) input  wire            stall,
+    input  wire            stall,
     input  wire            flush,
     input  wire            clrslot,
 

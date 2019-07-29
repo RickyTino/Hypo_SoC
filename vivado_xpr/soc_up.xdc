@@ -25,10 +25,10 @@ set_property PACKAGE_PIN L23 [get_ports {GPIO16_pins[12]}]
 set_property PACKAGE_PIN L22 [get_ports {GPIO16_pins[13]}]
 set_property PACKAGE_PIN M24 [get_ports {GPIO16_pins[14]}]
 set_property PACKAGE_PIN L20 [get_ports {GPIO16_pins[15]}]
+set_property PACKAGE_PIN M22 [get_ports rx]
+set_property PACKAGE_PIN N24 [get_ports tx]
 
-#GPIO Unused Pins FPGA_EXT_IO16-31
-#set_property PACKAGE_PIN M22
-#set_property PACKAGE_PIN N24
+#GPIO Unused Pins FPGA_EXT_IO18-31
 #set_property PACKAGE_PIN N23
 #set_property PACKAGE_PIN N22
 #set_property PACKAGE_PIN M21
@@ -45,6 +45,8 @@ set_property PACKAGE_PIN L20 [get_ports {GPIO16_pins[15]}]
 #set_property PACKAGE_PIN T22
 
 set_property IOSTANDARD LVCMOS33 [get_ports {GPIO16_pins[*]}]
+set_property IOSTANDARD LVCMOS33 [get_ports rx]
+set_property IOSTANDARD LVCMOS33 [get_ports tx]
 
 #LCD & TS
 set_property PACKAGE_PIN J25 [get_ports lcd_rst]
@@ -333,6 +335,29 @@ connect_debug_port u_ila_0/probe13 [get_nets [list {cpu_mid/mips_core/mmu_data/w
 connect_debug_port u_ila_0/probe14 [get_nets [list {cpu_mid/mips_core/mmu_inst/wen[0]} {cpu_mid/mips_core/mmu_inst/wen[1]} {cpu_mid/mips_core/mmu_inst/wen[2]} {cpu_mid/mips_core/mmu_inst/wen[3]}]]
 connect_debug_port u_ila_0/probe15 [get_nets [list {cpu_mid/mips_core/mmu_inst/wdata[0]} {cpu_mid/mips_core/mmu_inst/wdata[1]} {cpu_mid/mips_core/mmu_inst/wdata[2]} {cpu_mid/mips_core/mmu_inst/wdata[3]} {cpu_mid/mips_core/mmu_inst/wdata[4]} {cpu_mid/mips_core/mmu_inst/wdata[5]} {cpu_mid/mips_core/mmu_inst/wdata[6]} {cpu_mid/mips_core/mmu_inst/wdata[7]} {cpu_mid/mips_core/mmu_inst/wdata[8]} {cpu_mid/mips_core/mmu_inst/wdata[9]} {cpu_mid/mips_core/mmu_inst/wdata[10]} {cpu_mid/mips_core/mmu_inst/wdata[11]} {cpu_mid/mips_core/mmu_inst/wdata[12]} {cpu_mid/mips_core/mmu_inst/wdata[13]} {cpu_mid/mips_core/mmu_inst/wdata[14]} {cpu_mid/mips_core/mmu_inst/wdata[15]} {cpu_mid/mips_core/mmu_inst/wdata[16]} {cpu_mid/mips_core/mmu_inst/wdata[17]} {cpu_mid/mips_core/mmu_inst/wdata[18]} {cpu_mid/mips_core/mmu_inst/wdata[19]} {cpu_mid/mips_core/mmu_inst/wdata[20]} {cpu_mid/mips_core/mmu_inst/wdata[21]} {cpu_mid/mips_core/mmu_inst/wdata[22]} {cpu_mid/mips_core/mmu_inst/wdata[23]} {cpu_mid/mips_core/mmu_inst/wdata[24]} {cpu_mid/mips_core/mmu_inst/wdata[25]} {cpu_mid/mips_core/mmu_inst/wdata[26]} {cpu_mid/mips_core/mmu_inst/wdata[27]} {cpu_mid/mips_core/mmu_inst/wdata[28]} {cpu_mid/mips_core/mmu_inst/wdata[29]} {cpu_mid/mips_core/mmu_inst/wdata[30]} {cpu_mid/mips_core/mmu_inst/wdata[31]}]]
 
+
+
+
+connect_debug_port u_ila_0/probe5 [get_nets [list {cpu_mid/mips_core/reg_if_id/if_inst[0]} {cpu_mid/mips_core/reg_if_id/if_inst[1]} {cpu_mid/mips_core/reg_if_id/if_inst[2]} {cpu_mid/mips_core/reg_if_id/if_inst[3]} {cpu_mid/mips_core/reg_if_id/if_inst[4]} {cpu_mid/mips_core/reg_if_id/if_inst[5]} {cpu_mid/mips_core/reg_if_id/if_inst[6]} {cpu_mid/mips_core/reg_if_id/if_inst[7]} {cpu_mid/mips_core/reg_if_id/if_inst[8]} {cpu_mid/mips_core/reg_if_id/if_inst[9]} {cpu_mid/mips_core/reg_if_id/if_inst[10]} {cpu_mid/mips_core/reg_if_id/if_inst[11]} {cpu_mid/mips_core/reg_if_id/if_inst[12]} {cpu_mid/mips_core/reg_if_id/if_inst[13]} {cpu_mid/mips_core/reg_if_id/if_inst[14]} {cpu_mid/mips_core/reg_if_id/if_inst[15]} {cpu_mid/mips_core/reg_if_id/if_inst[16]} {cpu_mid/mips_core/reg_if_id/if_inst[17]} {cpu_mid/mips_core/reg_if_id/if_inst[18]} {cpu_mid/mips_core/reg_if_id/if_inst[19]} {cpu_mid/mips_core/reg_if_id/if_inst[20]} {cpu_mid/mips_core/reg_if_id/if_inst[21]} {cpu_mid/mips_core/reg_if_id/if_inst[22]} {cpu_mid/mips_core/reg_if_id/if_inst[23]} {cpu_mid/mips_core/reg_if_id/if_inst[24]} {cpu_mid/mips_core/reg_if_id/if_inst[25]} {cpu_mid/mips_core/reg_if_id/if_inst[26]} {cpu_mid/mips_core/reg_if_id/if_inst[27]} {cpu_mid/mips_core/reg_if_id/if_inst[28]} {cpu_mid/mips_core/reg_if_id/if_inst[29]} {cpu_mid/mips_core/reg_if_id/if_inst[30]} {cpu_mid/mips_core/reg_if_id/if_inst[31]}]]
+connect_debug_port u_ila_0/probe6 [get_nets [list {cpu_mid/mips_core/reg_if_id/if_pc[0]} {cpu_mid/mips_core/reg_if_id/if_pc[1]} {cpu_mid/mips_core/reg_if_id/if_pc[2]} {cpu_mid/mips_core/reg_if_id/if_pc[3]} {cpu_mid/mips_core/reg_if_id/if_pc[4]} {cpu_mid/mips_core/reg_if_id/if_pc[5]} {cpu_mid/mips_core/reg_if_id/if_pc[6]} {cpu_mid/mips_core/reg_if_id/if_pc[7]} {cpu_mid/mips_core/reg_if_id/if_pc[8]} {cpu_mid/mips_core/reg_if_id/if_pc[9]} {cpu_mid/mips_core/reg_if_id/if_pc[10]} {cpu_mid/mips_core/reg_if_id/if_pc[11]} {cpu_mid/mips_core/reg_if_id/if_pc[12]} {cpu_mid/mips_core/reg_if_id/if_pc[13]} {cpu_mid/mips_core/reg_if_id/if_pc[14]} {cpu_mid/mips_core/reg_if_id/if_pc[15]} {cpu_mid/mips_core/reg_if_id/if_pc[16]} {cpu_mid/mips_core/reg_if_id/if_pc[17]} {cpu_mid/mips_core/reg_if_id/if_pc[18]} {cpu_mid/mips_core/reg_if_id/if_pc[19]} {cpu_mid/mips_core/reg_if_id/if_pc[20]} {cpu_mid/mips_core/reg_if_id/if_pc[21]} {cpu_mid/mips_core/reg_if_id/if_pc[22]} {cpu_mid/mips_core/reg_if_id/if_pc[23]} {cpu_mid/mips_core/reg_if_id/if_pc[24]} {cpu_mid/mips_core/reg_if_id/if_pc[25]} {cpu_mid/mips_core/reg_if_id/if_pc[26]} {cpu_mid/mips_core/reg_if_id/if_pc[27]} {cpu_mid/mips_core/reg_if_id/if_pc[28]} {cpu_mid/mips_core/reg_if_id/if_pc[29]} {cpu_mid/mips_core/reg_if_id/if_pc[30]} {cpu_mid/mips_core/reg_if_id/if_pc[31]}]]
+
+
+connect_debug_port u_ila_0/probe0 [get_nets [list {axis_fifo_str_txd_tdata[0]} {axis_fifo_str_txd_tdata[1]} {axis_fifo_str_txd_tdata[2]} {axis_fifo_str_txd_tdata[3]} {axis_fifo_str_txd_tdata[4]} {axis_fifo_str_txd_tdata[5]} {axis_fifo_str_txd_tdata[6]} {axis_fifo_str_txd_tdata[7]} {axis_fifo_str_txd_tdata[8]} {axis_fifo_str_txd_tdata[9]} {axis_fifo_str_txd_tdata[10]} {axis_fifo_str_txd_tdata[11]} {axis_fifo_str_txd_tdata[12]} {axis_fifo_str_txd_tdata[13]} {axis_fifo_str_txd_tdata[14]} {axis_fifo_str_txd_tdata[15]} {axis_fifo_str_txd_tdata[16]} {axis_fifo_str_txd_tdata[17]} {axis_fifo_str_txd_tdata[18]} {axis_fifo_str_txd_tdata[19]} {axis_fifo_str_txd_tdata[20]} {axis_fifo_str_txd_tdata[21]} {axis_fifo_str_txd_tdata[22]} {axis_fifo_str_txd_tdata[23]} {axis_fifo_str_txd_tdata[24]} {axis_fifo_str_txd_tdata[25]} {axis_fifo_str_txd_tdata[26]} {axis_fifo_str_txd_tdata[27]} {axis_fifo_str_txd_tdata[28]} {axis_fifo_str_txd_tdata[29]} {axis_fifo_str_txd_tdata[30]} {axis_fifo_str_txd_tdata[31]}]]
+connect_debug_port u_ila_0/probe1 [get_nets [list {axis_fifo_str_txd_tid[0]} {axis_fifo_str_txd_tid[1]} {axis_fifo_str_txd_tid[2]} {axis_fifo_str_txd_tid[3]}]]
+connect_debug_port u_ila_0/probe2 [get_nets [list axis_fifo_str_txd_tready]]
+connect_debug_port u_ila_0/probe3 [get_nets [list axis_fifo_str_txd_tvalid]]
+connect_debug_port u_ila_1/clk [get_nets [list clk_audio_48kHz/inst/clk_out1]]
+connect_debug_port u_ila_1/probe0 [get_nets [list lrclk_out_OBUF]]
+connect_debug_port u_ila_1/probe1 [get_nets [list sclk_out_OBUF]]
+connect_debug_port u_ila_1/probe2 [get_nets [list sdata_0_out_OBUF]]
+connect_debug_port dbg_hub/clk [get_nets aud_mclk]
+
+
+
+
+
+
+
 create_debug_core u_ila_0 ila
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
 set_property ALL_PROBE_SAME_MU_CNT 2 [get_debug_cores u_ila_0]
@@ -345,144 +370,36 @@ set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
 set_property port_width 1 [get_debug_ports u_ila_0/clk]
 connect_debug_port u_ila_0/clk [get_nets [list clk_pll_33/inst/clk_out1]]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
-set_property port_width 32 [get_debug_ports u_ila_0/probe0]
-connect_debug_port u_ila_0/probe0 [get_nets [list {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[0]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[1]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[2]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[3]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[4]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[5]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[6]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[7]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[8]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[9]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[10]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[11]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[12]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[13]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[14]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[15]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[16]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[17]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[18]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[19]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[20]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[21]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[22]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[23]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[24]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[25]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[26]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[27]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[28]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[29]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[30]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wdata[31]}]]
+set_property port_width 8 [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {cpu_mid/mips_core/coprocessor0/Cause_IP[0]} {cpu_mid/mips_core/coprocessor0/Cause_IP[1]} {cpu_mid/mips_core/coprocessor0/Cause_IP[2]} {cpu_mid/mips_core/coprocessor0/Cause_IP[3]} {cpu_mid/mips_core/coprocessor0/Cause_IP[4]} {cpu_mid/mips_core/coprocessor0/Cause_IP[5]} {cpu_mid/mips_core/coprocessor0/Cause_IP[6]} {cpu_mid/mips_core/coprocessor0/Cause_IP[7]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-set_property port_width 5 [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list {cpu_mid/mips_core/regfile/r1addr[0]} {cpu_mid/mips_core/regfile/r1addr[1]} {cpu_mid/mips_core/regfile/r1addr[2]} {cpu_mid/mips_core/regfile/r1addr[3]} {cpu_mid/mips_core/regfile/r1addr[4]}]]
+set_property port_width 32 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {cpu_mid/mips_core/reg_if_id/if_inst[0]} {cpu_mid/mips_core/reg_if_id/if_inst[1]} {cpu_mid/mips_core/reg_if_id/if_inst[2]} {cpu_mid/mips_core/reg_if_id/if_inst[3]} {cpu_mid/mips_core/reg_if_id/if_inst[4]} {cpu_mid/mips_core/reg_if_id/if_inst[5]} {cpu_mid/mips_core/reg_if_id/if_inst[6]} {cpu_mid/mips_core/reg_if_id/if_inst[7]} {cpu_mid/mips_core/reg_if_id/if_inst[8]} {cpu_mid/mips_core/reg_if_id/if_inst[9]} {cpu_mid/mips_core/reg_if_id/if_inst[10]} {cpu_mid/mips_core/reg_if_id/if_inst[11]} {cpu_mid/mips_core/reg_if_id/if_inst[12]} {cpu_mid/mips_core/reg_if_id/if_inst[13]} {cpu_mid/mips_core/reg_if_id/if_inst[14]} {cpu_mid/mips_core/reg_if_id/if_inst[15]} {cpu_mid/mips_core/reg_if_id/if_inst[16]} {cpu_mid/mips_core/reg_if_id/if_inst[17]} {cpu_mid/mips_core/reg_if_id/if_inst[18]} {cpu_mid/mips_core/reg_if_id/if_inst[19]} {cpu_mid/mips_core/reg_if_id/if_inst[20]} {cpu_mid/mips_core/reg_if_id/if_inst[21]} {cpu_mid/mips_core/reg_if_id/if_inst[22]} {cpu_mid/mips_core/reg_if_id/if_inst[23]} {cpu_mid/mips_core/reg_if_id/if_inst[24]} {cpu_mid/mips_core/reg_if_id/if_inst[25]} {cpu_mid/mips_core/reg_if_id/if_inst[26]} {cpu_mid/mips_core/reg_if_id/if_inst[27]} {cpu_mid/mips_core/reg_if_id/if_inst[28]} {cpu_mid/mips_core/reg_if_id/if_inst[29]} {cpu_mid/mips_core/reg_if_id/if_inst[30]} {cpu_mid/mips_core/reg_if_id/if_inst[31]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-set_property port_width 32 [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list {cpu_mid/mips_core/regfile/r1data[0]} {cpu_mid/mips_core/regfile/r1data[1]} {cpu_mid/mips_core/regfile/r1data[2]} {cpu_mid/mips_core/regfile/r1data[3]} {cpu_mid/mips_core/regfile/r1data[4]} {cpu_mid/mips_core/regfile/r1data[5]} {cpu_mid/mips_core/regfile/r1data[6]} {cpu_mid/mips_core/regfile/r1data[7]} {cpu_mid/mips_core/regfile/r1data[8]} {cpu_mid/mips_core/regfile/r1data[9]} {cpu_mid/mips_core/regfile/r1data[10]} {cpu_mid/mips_core/regfile/r1data[11]} {cpu_mid/mips_core/regfile/r1data[12]} {cpu_mid/mips_core/regfile/r1data[13]} {cpu_mid/mips_core/regfile/r1data[14]} {cpu_mid/mips_core/regfile/r1data[15]} {cpu_mid/mips_core/regfile/r1data[16]} {cpu_mid/mips_core/regfile/r1data[17]} {cpu_mid/mips_core/regfile/r1data[18]} {cpu_mid/mips_core/regfile/r1data[19]} {cpu_mid/mips_core/regfile/r1data[20]} {cpu_mid/mips_core/regfile/r1data[21]} {cpu_mid/mips_core/regfile/r1data[22]} {cpu_mid/mips_core/regfile/r1data[23]} {cpu_mid/mips_core/regfile/r1data[24]} {cpu_mid/mips_core/regfile/r1data[25]} {cpu_mid/mips_core/regfile/r1data[26]} {cpu_mid/mips_core/regfile/r1data[27]} {cpu_mid/mips_core/regfile/r1data[28]} {cpu_mid/mips_core/regfile/r1data[29]} {cpu_mid/mips_core/regfile/r1data[30]} {cpu_mid/mips_core/regfile/r1data[31]}]]
+set_property port_width 2 [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {soc_intc_intr[0]} {soc_intc_intr[1]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-set_property port_width 4 [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list {cpu_mid/mips_core/regfile/we[0]} {cpu_mid/mips_core/regfile/we[1]} {cpu_mid/mips_core/regfile/we[2]} {cpu_mid/mips_core/regfile/we[3]}]]
+set_property port_width 1 [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list rx_IBUF]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
-set_property port_width 32 [get_debug_ports u_ila_0/probe4]
-connect_debug_port u_ila_0/probe4 [get_nets [list {cpu_mid/mips_core/regfile/wdata[0]} {cpu_mid/mips_core/regfile/wdata[1]} {cpu_mid/mips_core/regfile/wdata[2]} {cpu_mid/mips_core/regfile/wdata[3]} {cpu_mid/mips_core/regfile/wdata[4]} {cpu_mid/mips_core/regfile/wdata[5]} {cpu_mid/mips_core/regfile/wdata[6]} {cpu_mid/mips_core/regfile/wdata[7]} {cpu_mid/mips_core/regfile/wdata[8]} {cpu_mid/mips_core/regfile/wdata[9]} {cpu_mid/mips_core/regfile/wdata[10]} {cpu_mid/mips_core/regfile/wdata[11]} {cpu_mid/mips_core/regfile/wdata[12]} {cpu_mid/mips_core/regfile/wdata[13]} {cpu_mid/mips_core/regfile/wdata[14]} {cpu_mid/mips_core/regfile/wdata[15]} {cpu_mid/mips_core/regfile/wdata[16]} {cpu_mid/mips_core/regfile/wdata[17]} {cpu_mid/mips_core/regfile/wdata[18]} {cpu_mid/mips_core/regfile/wdata[19]} {cpu_mid/mips_core/regfile/wdata[20]} {cpu_mid/mips_core/regfile/wdata[21]} {cpu_mid/mips_core/regfile/wdata[22]} {cpu_mid/mips_core/regfile/wdata[23]} {cpu_mid/mips_core/regfile/wdata[24]} {cpu_mid/mips_core/regfile/wdata[25]} {cpu_mid/mips_core/regfile/wdata[26]} {cpu_mid/mips_core/regfile/wdata[27]} {cpu_mid/mips_core/regfile/wdata[28]} {cpu_mid/mips_core/regfile/wdata[29]} {cpu_mid/mips_core/regfile/wdata[30]} {cpu_mid/mips_core/regfile/wdata[31]}]]
+set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list soc_intc_irq]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
-set_property port_width 32 [get_debug_ports u_ila_0/probe5]
-connect_debug_port u_ila_0/probe5 [get_nets [list {cpu_mid/mips_core/reg_ex_mem/ex_pc[0]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[1]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[2]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[3]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[4]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[5]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[6]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[7]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[8]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[9]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[10]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[11]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[12]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[13]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[14]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[15]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[16]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[17]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[18]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[19]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[20]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[21]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[22]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[23]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[24]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[25]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[26]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[27]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[28]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[29]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[30]} {cpu_mid/mips_core/reg_ex_mem/ex_pc[31]}]]
+set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list tx_OBUF]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
-set_property port_width 32 [get_debug_ports u_ila_0/probe6]
-connect_debug_port u_ila_0/probe6 [get_nets [list {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[0]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[1]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[2]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[3]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[4]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[5]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[6]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[7]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[8]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[9]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[10]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[11]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[12]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[13]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[14]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[15]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[16]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[17]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[18]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[19]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[20]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[21]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[22]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[23]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[24]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[25]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[26]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[27]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[28]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[29]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[30]} {cpu_mid/mips_core/reg_ex_mem/ex_m_vaddr[31]}]]
+set_property port_width 1 [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list uart0_int]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
-set_property port_width 4 [get_debug_ports u_ila_0/probe7]
-connect_debug_port u_ila_0/probe7 [get_nets [list {cpu_mid/mips_core/reg_ex_mem/ex_m_wen[0]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wen[1]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wen[2]} {cpu_mid/mips_core/reg_ex_mem/ex_m_wen[3]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
-set_property port_width 5 [get_debug_ports u_ila_0/probe8]
-connect_debug_port u_ila_0/probe8 [get_nets [list {cpu_mid/mips_core/reg_ex_mem/ex_wraddr[0]} {cpu_mid/mips_core/reg_ex_mem/ex_wraddr[1]} {cpu_mid/mips_core/reg_ex_mem/ex_wraddr[2]} {cpu_mid/mips_core/reg_ex_mem/ex_wraddr[3]} {cpu_mid/mips_core/reg_ex_mem/ex_wraddr[4]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
-set_property port_width 32 [get_debug_ports u_ila_0/probe9]
-connect_debug_port u_ila_0/probe9 [get_nets [list {cpu_mid/mips_core/regfile/r2data[0]} {cpu_mid/mips_core/regfile/r2data[1]} {cpu_mid/mips_core/regfile/r2data[2]} {cpu_mid/mips_core/regfile/r2data[3]} {cpu_mid/mips_core/regfile/r2data[4]} {cpu_mid/mips_core/regfile/r2data[5]} {cpu_mid/mips_core/regfile/r2data[6]} {cpu_mid/mips_core/regfile/r2data[7]} {cpu_mid/mips_core/regfile/r2data[8]} {cpu_mid/mips_core/regfile/r2data[9]} {cpu_mid/mips_core/regfile/r2data[10]} {cpu_mid/mips_core/regfile/r2data[11]} {cpu_mid/mips_core/regfile/r2data[12]} {cpu_mid/mips_core/regfile/r2data[13]} {cpu_mid/mips_core/regfile/r2data[14]} {cpu_mid/mips_core/regfile/r2data[15]} {cpu_mid/mips_core/regfile/r2data[16]} {cpu_mid/mips_core/regfile/r2data[17]} {cpu_mid/mips_core/regfile/r2data[18]} {cpu_mid/mips_core/regfile/r2data[19]} {cpu_mid/mips_core/regfile/r2data[20]} {cpu_mid/mips_core/regfile/r2data[21]} {cpu_mid/mips_core/regfile/r2data[22]} {cpu_mid/mips_core/regfile/r2data[23]} {cpu_mid/mips_core/regfile/r2data[24]} {cpu_mid/mips_core/regfile/r2data[25]} {cpu_mid/mips_core/regfile/r2data[26]} {cpu_mid/mips_core/regfile/r2data[27]} {cpu_mid/mips_core/regfile/r2data[28]} {cpu_mid/mips_core/regfile/r2data[29]} {cpu_mid/mips_core/regfile/r2data[30]} {cpu_mid/mips_core/regfile/r2data[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
-set_property port_width 4 [get_debug_ports u_ila_0/probe10]
-connect_debug_port u_ila_0/probe10 [get_nets [list {cpu_mid/mips_core/reg_ex_mem/ex_wreg[0]} {cpu_mid/mips_core/reg_ex_mem/ex_wreg[1]} {cpu_mid/mips_core/reg_ex_mem/ex_wreg[2]} {cpu_mid/mips_core/reg_ex_mem/ex_wreg[3]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
-set_property port_width 5 [get_debug_ports u_ila_0/probe11]
-connect_debug_port u_ila_0/probe11 [get_nets [list {cpu_mid/mips_core/regfile/waddr[0]} {cpu_mid/mips_core/regfile/waddr[1]} {cpu_mid/mips_core/regfile/waddr[2]} {cpu_mid/mips_core/regfile/waddr[3]} {cpu_mid/mips_core/regfile/waddr[4]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
-set_property port_width 5 [get_debug_ports u_ila_0/probe12]
-connect_debug_port u_ila_0/probe12 [get_nets [list {cpu_mid/mips_core/regfile/r2addr[0]} {cpu_mid/mips_core/regfile/r2addr[1]} {cpu_mid/mips_core/regfile/r2addr[2]} {cpu_mid/mips_core/regfile/r2addr[3]} {cpu_mid/mips_core/regfile/r2addr[4]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe13]
-set_property port_width 32 [get_debug_ports u_ila_0/probe13]
-connect_debug_port u_ila_0/probe13 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/wb_pc[0]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[1]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[2]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[3]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[4]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[5]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[6]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[7]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[8]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[9]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[10]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[11]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[12]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[13]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[14]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[15]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[16]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[17]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[18]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[19]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[20]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[21]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[22]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[23]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[24]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[25]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[26]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[27]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[28]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[29]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[30]} {cpu_mid/mips_core/reg_mem_wb/wb_pc[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe14]
-set_property port_width 32 [get_debug_ports u_ila_0/probe14]
-connect_debug_port u_ila_0/probe14 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[0]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[1]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[2]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[3]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[4]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[5]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[6]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[7]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[8]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[9]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[10]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[11]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[12]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[13]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[14]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[15]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[16]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[17]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[18]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[19]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[20]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[21]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[22]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[23]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[24]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[25]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[26]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[27]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[28]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[29]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[30]} {cpu_mid/mips_core/reg_mem_wb/wb_m_rdata[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe15]
-set_property port_width 4 [get_debug_ports u_ila_0/probe15]
-connect_debug_port u_ila_0/probe15 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/mem_wreg[0]} {cpu_mid/mips_core/reg_mem_wb/mem_wreg[1]} {cpu_mid/mips_core/reg_mem_wb/mem_wreg[2]} {cpu_mid/mips_core/reg_mem_wb/mem_wreg[3]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe16]
-set_property port_width 32 [get_debug_ports u_ila_0/probe16]
-connect_debug_port u_ila_0/probe16 [get_nets [list {cpu_mid/mips_core/reg_id_ex/id_pc[0]} {cpu_mid/mips_core/reg_id_ex/id_pc[1]} {cpu_mid/mips_core/reg_id_ex/id_pc[2]} {cpu_mid/mips_core/reg_id_ex/id_pc[3]} {cpu_mid/mips_core/reg_id_ex/id_pc[4]} {cpu_mid/mips_core/reg_id_ex/id_pc[5]} {cpu_mid/mips_core/reg_id_ex/id_pc[6]} {cpu_mid/mips_core/reg_id_ex/id_pc[7]} {cpu_mid/mips_core/reg_id_ex/id_pc[8]} {cpu_mid/mips_core/reg_id_ex/id_pc[9]} {cpu_mid/mips_core/reg_id_ex/id_pc[10]} {cpu_mid/mips_core/reg_id_ex/id_pc[11]} {cpu_mid/mips_core/reg_id_ex/id_pc[12]} {cpu_mid/mips_core/reg_id_ex/id_pc[13]} {cpu_mid/mips_core/reg_id_ex/id_pc[14]} {cpu_mid/mips_core/reg_id_ex/id_pc[15]} {cpu_mid/mips_core/reg_id_ex/id_pc[16]} {cpu_mid/mips_core/reg_id_ex/id_pc[17]} {cpu_mid/mips_core/reg_id_ex/id_pc[18]} {cpu_mid/mips_core/reg_id_ex/id_pc[19]} {cpu_mid/mips_core/reg_id_ex/id_pc[20]} {cpu_mid/mips_core/reg_id_ex/id_pc[21]} {cpu_mid/mips_core/reg_id_ex/id_pc[22]} {cpu_mid/mips_core/reg_id_ex/id_pc[23]} {cpu_mid/mips_core/reg_id_ex/id_pc[24]} {cpu_mid/mips_core/reg_id_ex/id_pc[25]} {cpu_mid/mips_core/reg_id_ex/id_pc[26]} {cpu_mid/mips_core/reg_id_ex/id_pc[27]} {cpu_mid/mips_core/reg_id_ex/id_pc[28]} {cpu_mid/mips_core/reg_id_ex/id_pc[29]} {cpu_mid/mips_core/reg_id_ex/id_pc[30]} {cpu_mid/mips_core/reg_id_ex/id_pc[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe17]
-set_property port_width 5 [get_debug_ports u_ila_0/probe17]
-connect_debug_port u_ila_0/probe17 [get_nets [list {cpu_mid/mips_core/reg_id_ex/id_wraddr[0]} {cpu_mid/mips_core/reg_id_ex/id_wraddr[1]} {cpu_mid/mips_core/reg_id_ex/id_wraddr[2]} {cpu_mid/mips_core/reg_id_ex/id_wraddr[3]} {cpu_mid/mips_core/reg_id_ex/id_wraddr[4]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe18]
-set_property port_width 32 [get_debug_ports u_ila_0/probe18]
-connect_debug_port u_ila_0/probe18 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[0]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[1]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[2]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[3]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[4]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[5]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[6]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[7]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[8]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[9]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[10]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[11]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[12]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[13]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[14]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[15]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[16]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[17]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[18]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[19]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[20]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[21]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[22]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[23]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[24]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[25]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[26]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[27]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[28]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[29]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[30]} {cpu_mid/mips_core/reg_mem_wb/mem_m_rdata[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe19]
-set_property port_width 5 [get_debug_ports u_ila_0/probe19]
-connect_debug_port u_ila_0/probe19 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/mem_wraddr[0]} {cpu_mid/mips_core/reg_mem_wb/mem_wraddr[1]} {cpu_mid/mips_core/reg_mem_wb/mem_wraddr[2]} {cpu_mid/mips_core/reg_mem_wb/mem_wraddr[3]} {cpu_mid/mips_core/reg_mem_wb/mem_wraddr[4]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe20]
-set_property port_width 32 [get_debug_ports u_ila_0/probe20]
-connect_debug_port u_ila_0/probe20 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/mem_pc[0]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[1]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[2]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[3]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[4]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[5]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[6]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[7]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[8]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[9]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[10]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[11]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[12]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[13]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[14]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[15]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[16]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[17]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[18]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[19]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[20]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[21]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[22]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[23]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[24]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[25]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[26]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[27]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[28]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[29]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[30]} {cpu_mid/mips_core/reg_mem_wb/mem_pc[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe21]
-set_property port_width 4 [get_debug_ports u_ila_0/probe21]
-connect_debug_port u_ila_0/probe21 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/wb_wreg[0]} {cpu_mid/mips_core/reg_mem_wb/wb_wreg[1]} {cpu_mid/mips_core/reg_mem_wb/wb_wreg[2]} {cpu_mid/mips_core/reg_mem_wb/wb_wreg[3]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe22]
-set_property port_width 32 [get_debug_ports u_ila_0/probe22]
-connect_debug_port u_ila_0/probe22 [get_nets [list {cpu_mid/mips_core/reg_if_id/if_inst[0]} {cpu_mid/mips_core/reg_if_id/if_inst[1]} {cpu_mid/mips_core/reg_if_id/if_inst[2]} {cpu_mid/mips_core/reg_if_id/if_inst[3]} {cpu_mid/mips_core/reg_if_id/if_inst[4]} {cpu_mid/mips_core/reg_if_id/if_inst[5]} {cpu_mid/mips_core/reg_if_id/if_inst[6]} {cpu_mid/mips_core/reg_if_id/if_inst[7]} {cpu_mid/mips_core/reg_if_id/if_inst[8]} {cpu_mid/mips_core/reg_if_id/if_inst[9]} {cpu_mid/mips_core/reg_if_id/if_inst[10]} {cpu_mid/mips_core/reg_if_id/if_inst[11]} {cpu_mid/mips_core/reg_if_id/if_inst[12]} {cpu_mid/mips_core/reg_if_id/if_inst[13]} {cpu_mid/mips_core/reg_if_id/if_inst[14]} {cpu_mid/mips_core/reg_if_id/if_inst[15]} {cpu_mid/mips_core/reg_if_id/if_inst[16]} {cpu_mid/mips_core/reg_if_id/if_inst[17]} {cpu_mid/mips_core/reg_if_id/if_inst[18]} {cpu_mid/mips_core/reg_if_id/if_inst[19]} {cpu_mid/mips_core/reg_if_id/if_inst[20]} {cpu_mid/mips_core/reg_if_id/if_inst[21]} {cpu_mid/mips_core/reg_if_id/if_inst[22]} {cpu_mid/mips_core/reg_if_id/if_inst[23]} {cpu_mid/mips_core/reg_if_id/if_inst[24]} {cpu_mid/mips_core/reg_if_id/if_inst[25]} {cpu_mid/mips_core/reg_if_id/if_inst[26]} {cpu_mid/mips_core/reg_if_id/if_inst[27]} {cpu_mid/mips_core/reg_if_id/if_inst[28]} {cpu_mid/mips_core/reg_if_id/if_inst[29]} {cpu_mid/mips_core/reg_if_id/if_inst[30]} {cpu_mid/mips_core/reg_if_id/if_inst[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe23]
-set_property port_width 32 [get_debug_ports u_ila_0/probe23]
-connect_debug_port u_ila_0/probe23 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[0]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[1]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[2]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[3]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[4]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[5]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[6]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[7]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[8]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[9]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[10]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[11]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[12]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[13]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[14]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[15]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[16]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[17]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[18]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[19]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[20]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[21]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[22]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[23]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[24]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[25]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[26]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[27]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[28]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[29]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[30]} {cpu_mid/mips_core/reg_mem_wb/wb_m_vaddr[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe24]
-set_property port_width 5 [get_debug_ports u_ila_0/probe24]
-connect_debug_port u_ila_0/probe24 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/wb_wraddr[0]} {cpu_mid/mips_core/reg_mem_wb/wb_wraddr[1]} {cpu_mid/mips_core/reg_mem_wb/wb_wraddr[2]} {cpu_mid/mips_core/reg_mem_wb/wb_wraddr[3]} {cpu_mid/mips_core/reg_mem_wb/wb_wraddr[4]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe25]
-set_property port_width 32 [get_debug_ports u_ila_0/probe25]
-connect_debug_port u_ila_0/probe25 [get_nets [list {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[0]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[1]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[2]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[3]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[4]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[5]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[6]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[7]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[8]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[9]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[10]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[11]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[12]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[13]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[14]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[15]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[16]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[17]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[18]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[19]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[20]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[21]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[22]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[23]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[24]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[25]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[26]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[27]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[28]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[29]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[30]} {cpu_mid/mips_core/reg_mem_wb/mem_m_vaddr[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe26]
-set_property port_width 32 [get_debug_ports u_ila_0/probe26]
-connect_debug_port u_ila_0/probe26 [get_nets [list {cpu_mid/mips_core/reg_if_id/if_pc[0]} {cpu_mid/mips_core/reg_if_id/if_pc[1]} {cpu_mid/mips_core/reg_if_id/if_pc[2]} {cpu_mid/mips_core/reg_if_id/if_pc[3]} {cpu_mid/mips_core/reg_if_id/if_pc[4]} {cpu_mid/mips_core/reg_if_id/if_pc[5]} {cpu_mid/mips_core/reg_if_id/if_pc[6]} {cpu_mid/mips_core/reg_if_id/if_pc[7]} {cpu_mid/mips_core/reg_if_id/if_pc[8]} {cpu_mid/mips_core/reg_if_id/if_pc[9]} {cpu_mid/mips_core/reg_if_id/if_pc[10]} {cpu_mid/mips_core/reg_if_id/if_pc[11]} {cpu_mid/mips_core/reg_if_id/if_pc[12]} {cpu_mid/mips_core/reg_if_id/if_pc[13]} {cpu_mid/mips_core/reg_if_id/if_pc[14]} {cpu_mid/mips_core/reg_if_id/if_pc[15]} {cpu_mid/mips_core/reg_if_id/if_pc[16]} {cpu_mid/mips_core/reg_if_id/if_pc[17]} {cpu_mid/mips_core/reg_if_id/if_pc[18]} {cpu_mid/mips_core/reg_if_id/if_pc[19]} {cpu_mid/mips_core/reg_if_id/if_pc[20]} {cpu_mid/mips_core/reg_if_id/if_pc[21]} {cpu_mid/mips_core/reg_if_id/if_pc[22]} {cpu_mid/mips_core/reg_if_id/if_pc[23]} {cpu_mid/mips_core/reg_if_id/if_pc[24]} {cpu_mid/mips_core/reg_if_id/if_pc[25]} {cpu_mid/mips_core/reg_if_id/if_pc[26]} {cpu_mid/mips_core/reg_if_id/if_pc[27]} {cpu_mid/mips_core/reg_if_id/if_pc[28]} {cpu_mid/mips_core/reg_if_id/if_pc[29]} {cpu_mid/mips_core/reg_if_id/if_pc[30]} {cpu_mid/mips_core/reg_if_id/if_pc[31]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe27]
-set_property port_width 1 [get_debug_ports u_ila_0/probe27]
-connect_debug_port u_ila_0/probe27 [get_nets [list cpu_mid/mips_core/reg_ex_mem/ex_m_en]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe28]
-set_property port_width 1 [get_debug_ports u_ila_0/probe28]
-connect_debug_port u_ila_0/probe28 [get_nets [list cpu_mid/mips_core/reg_id_ex/id_wreg]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe29]
-set_property port_width 1 [get_debug_ports u_ila_0/probe29]
-connect_debug_port u_ila_0/probe29 [get_nets [list cpu_mid/mips_core/regfile/re1]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe30]
-set_property port_width 1 [get_debug_ports u_ila_0/probe30]
-connect_debug_port u_ila_0/probe30 [get_nets [list cpu_mid/mips_core/regfile/re2]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe31]
-set_property port_width 1 [get_debug_ports u_ila_0/probe31]
-connect_debug_port u_ila_0/probe31 [get_nets [list cpu_mid/mips_core/reg_if_id/stall]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe32]
-set_property port_width 1 [get_debug_ports u_ila_0/probe32]
-connect_debug_port u_ila_0/probe32 [get_nets [list cpu_mid/mips_core/reg_mem_wb/stall]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe33]
-set_property port_width 1 [get_debug_ports u_ila_0/probe33]
-connect_debug_port u_ila_0/probe33 [get_nets [list cpu_mid/mips_core/reg_ex_mem/stall]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe34]
-set_property port_width 1 [get_debug_ports u_ila_0/probe34]
-connect_debug_port u_ila_0/probe34 [get_nets [list cpu_mid/mips_core/reg_id_ex/stall]]
+set_property port_width 1 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list uart_lite_int]]
 set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
 set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
 set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]

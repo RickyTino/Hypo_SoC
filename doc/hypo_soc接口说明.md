@@ -18,6 +18,10 @@ Hypo_SoC以龙芯的SoC_up为基础，对结构进行了微调和优化，并添
     Nand Flash      1fe7_8000 - 1fe7_bfff       16KB        14
     DDR3[1]         0000_0000 - 17ff_ffff       ----        --
     DDR3[2]         2000_0000 - ffff_ffff       ----        --
+    
+    GPIO 16PINS     1fd1_0000 - 1fd1_7fff
+    AXI UART LITE   1fd1_8000 - 1df1_8fff
+    AXI INTC        1fd1_9000 - 1fd1_9fff
 
 注：DDR3实际大小128MB
 

@@ -39,6 +39,13 @@ module soc_up_top(
 
     //------gpio----------------
     inout  [15:0] GPIO16_pins,
+    (*mark_debug = "true"*) input rx,
+    (*mark_debug = "true"*) output tx,
+    // (*mark_debug = "true"*) output lrclk_out,
+    // (*mark_debug = "true"*) output sclk_out,
+    // (*mark_debug = "true"*) output sdata_0_out,
+
+
     output [15:0] led,
     output [1 :0] led_rg0,
     output [1 :0] led_rg1,
@@ -580,7 +587,7 @@ wire UART_RI,    UART_DCD;
 assign UART_CTS = 1'b0;
 assign UART_DSR = 1'b0;
 assign UART_DCD = 1'b0;
-wire uart0_int   ;
+(*mark_debug = "true"*) wire uart0_int   ;
 wire uart0_txd_o ;
 wire uart0_txd_i ;
 wire uart0_txd_oe;
@@ -604,12 +611,74 @@ assign     uart0_dcd_i = UART_DCD;
 assign     uart0_dsr_i = UART_DSR;
 assign     uart0_ri_i  = UART_RI ;
 
-//interrupt
-wire mac_int;
-wire [5:0] int_out;
-wire [5:0] int_n_i;
-assign int_out = {1'b0,dma_int,nand_int,spi_inta_o,uart0_int,mac_int};
-assign int_n_i = ~int_out;
+// ---- INTERRUPT
+// -- INTC NET TYPE
+wire [8:0]  soc_intc_awaddr;
+wire        soc_intc_awvalid;
+wire        soc_intc_awready;
+
+wire [31:0] soc_intc_wdata;
+wire [3:0]  soc_intc_wstrb;
+wire        soc_intc_wvalid;
+wire        soc_intc_wready;
+
+wire [1:0]  soc_intc_bresp;
+wire        soc_intc_bvalid;
+wire        soc_intc_bready;
+
+wire [8:0]  soc_intc_araddr;
+wire        soc_intc_arvalid;
+wire        soc_intc_arready;
+
+wire [31:0] soc_intc_rdata;
+wire [1:0]  soc_intc_rresp;
+wire        soc_intc_rvalid;
+wire        soc_intc_rready;
+
+(*mark_debug = "true"*) wire [1:0]  soc_intc_intr;
+(*mark_debug = "true"*) wire        soc_intc_irq;
+
+// -- GENERAL NET TYPE
+(*mark_debug = "true"*) wire uart_lite_int; // Connected to XUart_Lite .irq
+wire        mac_int;
+wire [5:0]  int_out;
+wire [5:0]  int_n_i;
+
+assign      soc_intc_intr   = {uart_lite_int, uart0_int}; // INTC interrupt input, LSB is the highest priority
+//assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, soc_intc_irq, mac_int};
+assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, uart0_int, mac_int};
+assign      int_n_i         = ~int_out;
+
+// -- AXI INTC
+axi_intc_0 axi_soc_intc (
+  .s_axi_aclk       (aclk), 
+  .s_axi_aresetn    (aresetn), 
+
+  .s_axi_awaddr     (soc_intc_awaddr), 
+  .s_axi_awvalid    (soc_intc_awvalid), 
+  .s_axi_awready    (soc_intc_awready),  
+
+  .s_axi_wdata      (soc_intc_wdata), 
+  .s_axi_wstrb      (soc_intc_wstrb),  
+  .s_axi_wvalid     (soc_intc_wvalid), 
+  .s_axi_wready     (soc_intc_wready),   
+
+  .s_axi_bresp      (soc_intc_bresp),  
+  .s_axi_bvalid     (soc_intc_bvalid),   
+  .s_axi_bready     (soc_intc_bready),   
+
+  .s_axi_araddr     (soc_intc_araddr),  
+  .s_axi_arvalid    (soc_intc_arvalid),  
+  .s_axi_arready    (soc_intc_arready),  
+
+  .s_axi_rdata      (soc_intc_rdata),   
+  .s_axi_rresp      (soc_intc_rresp),     
+  .s_axi_rvalid     (soc_intc_rvalid),    
+  .s_axi_rready     (soc_intc_rready),    
+  
+  .intr             (soc_intc_intr),             
+  .irq              (soc_intc_irq)          
+);
 
 // cpu
 assign EJTAG_TDO = 0;
@@ -656,7 +725,7 @@ MangoMIPS_Top cpu_mid(
 .m_bready       (m0_bready    )
 );
 
-// ------------------------------------- GPIO -------------------------------------
+// ------------------------------------- AXI4 -------------------------------------
 // ---- AXI4 CROSSBAR
 // -- WIRE NET TYPE
 wire [3 : 0]    s_axi3t4l_awid;
@@ -700,7 +769,7 @@ wire [0 : 0]    s_axi3t4l_rvalid;
 wire [0 : 0]    s_axi3t4l_rready;
 
 // ---- GPIO
-// -- WIRE NET TYOPE
+// -- WIRE NET TYPE
 wire [8:0]  single_gpio_awaddr;
 wire        single_gpio_awvalid;
 wire        single_gpio_awready;
@@ -735,6 +804,86 @@ generate
         assign single_gpio_io_i[gpio_itr] = GPIO16_pins[gpio_itr];
     end
 endgenerate
+
+// // ---- AXI4 FIFO
+// // -- WIRE NET TYPE
+// wire [31:0] axis_fifo_awaddr;
+// wire        axis_fifo_awvalid;
+// wire        axis_fifo_awready;
+
+// wire [31:0] axis_fifo_wdata;
+// wire [3:0]  axis_fifo_wstrb;
+// wire        axis_fifo_wvalid;
+// wire        axis_fifo_wready;
+
+// wire [1:0]  axis_fifo_bresp;
+// wire        axis_fifo_bvalid;
+// wire        axis_fifo_bready;
+
+// wire [31:0] axis_fifo_araddr;
+// wire        axis_fifo_arvalid;
+// wire        axis_fifo_arready;
+
+// wire [31:0] axis_fifo_rdata;
+// wire [1:0]  axis_fifo_rresp;
+// wire        axis_fifo_rvalid;
+// wire        axis_fifo_rready;
+
+// wire        axis_fifo_prmry_reset_n;
+
+// (*mark_debug = "true"*) wire        axis_fifo_str_txd_tvalid;
+// (*mark_debug = "true"*) wire        axis_fifo_str_txd_tready;
+// wire        axis_fifo_str_txd_tlast;
+// (*mark_debug = "true"*) wire [31:0] axis_fifo_str_txd_tdata;
+// (*mark_debug = "true"*) wire [3:0]  axis_fifo_str_txd_tid;
+
+// // ---- AXI4 I2S
+// // -- WIRE NET TYPE
+// wire        axis_i2s_awvalid;
+// wire        axis_i2s_awready;
+// wire [7:0]  axis_i2s_awaddr;
+
+// wire        axis_i2s_wvalid;
+// wire        axis_i2s_wready;
+// wire [31:0] axis_i2s_wdata;
+
+// wire        axis_i2s_bvalid;
+// wire        axis_i2s_bready;
+// wire [1:0]  axis_i2s_bresp;
+
+// wire        axis_i2s_arvalid;
+// wire        axis_i2s_arready;
+// wire [7:0]  axis_i2s_araddr;
+
+// wire        axis_i2s_rvalid;
+// wire        axis_i2s_rready;
+// wire [31:0] axis_i2s_rdata;
+// wire [1:0]  axis_i2s_rresp;
+
+// ---- UART LITE
+// -- WIRE NET TYPE
+wire [3:0]  uart_lite_awaddr;
+wire        uart_lite_awvalid;
+wire        uart_lite_awready;
+
+wire [31:0] uart_lite_wdata;
+wire [3:0]  uart_lite_wstrb;
+wire        uart_lite_wvalid;
+wire        uart_lite_wready;
+
+wire [1:0]  uart_lite_bresp;
+wire        uart_lite_bvalid;
+wire        uart_lite_bready;
+
+wire [3:0]  uart_lite_araddr;
+wire        uart_lite_arvalid;
+wire        uart_lite_arready;
+
+wire [31:0] uart_lite_rdata;
+wire [1:0]  uart_lite_rresp;
+wire        uart_lite_rvalid;
+wire        uart_lite_rready;
+
 
 // -- Crossbar IP Core
 axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
@@ -789,8 +938,49 @@ axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
   .s_axi_rvalid     (s_axi3t4l_rvalid   ),
   .s_axi_rready     (s_axi3t4l_rready   ),
 
+//   // Master Interface, connected to the AXI4LITE GPIO IP core.
+//   .m_axi_awaddr     ({{24'b0,axis_i2s_awaddr},  axis_fifo_awaddr,       {23'b0,single_gpio_awaddr}}),
+//   .m_axi_awlen      (),
+//   .m_axi_awsize     (),
+//   .m_axi_awburst    (),
+//   .m_axi_awlock     (),
+//   .m_axi_awcache    (),
+//   .m_axi_awprot     (),
+//   .m_axi_awregion   (),
+//   .m_axi_awqos      (),
+//   .m_axi_awvalid    ({axis_i2s_awvalid,         axis_fifo_awvalid,      single_gpio_awvalid   }),
+//   .m_axi_awready    ({axis_i2s_awready,         axis_fifo_awready,      single_gpio_awready   }),
+
+//   .m_axi_wdata      ({axis_i2s_wdata,           axis_fifo_wdata,        single_gpio_wdata     }),
+//   .m_axi_wstrb      ({                          axis_fifo_wstrb,        single_gpio_wstrb     }),
+//   .m_axi_wlast      (),
+//   .m_axi_wvalid     ({axis_i2s_wvalid,          axis_fifo_wvalid,       single_gpio_wvalid    }),
+//   .m_axi_wready     ({axis_i2s_wready,          axis_fifo_wready,       single_gpio_wready    }),
+
+//   .m_axi_bresp      ({axis_i2s_bresp,           axis_fifo_bresp,        single_gpio_bresp     }),
+//   .m_axi_bvalid     ({axis_i2s_bvalid,          axis_fifo_bvalid,       single_gpio_bvalid    }),
+//   .m_axi_bready     ({axis_i2s_bready,          axis_fifo_bready,       single_gpio_bready    }),
+
+//   .m_axi_araddr     ({{24'b0,axis_i2s_araddr},  axis_fifo_araddr,       {23'b0,single_gpio_araddr}}),
+//   .m_axi_arlen      (),
+//   .m_axi_arsize     (),
+//   .m_axi_arburst    (),
+//   .m_axi_arlock     (),
+//   .m_axi_arcache    (),
+//   .m_axi_arprot     (),
+//   .m_axi_arregion   (),
+//   .m_axi_arqos      (),
+//   .m_axi_arvalid    ({axis_i2s_arvalid,         axis_fifo_arvalid,      single_gpio_arvalid   }),
+//   .m_axi_arready    ({axis_i2s_arready,         axis_fifo_arready,      single_gpio_arready   }),
+
+//   .m_axi_rdata      ({axis_i2s_rdata,           axis_fifo_rdata,        single_gpio_rdata     }),
+//   .m_axi_rresp      ({axis_i2s_rresp,           axis_fifo_rresp,        single_gpio_rresp     }),
+//   .m_axi_rlast      ({axis_i2s_rvalid,          axis_fifo_rvalid,       single_gpio_rvalid    }),
+//   .m_axi_rvalid     ({axis_i2s_rvalid,          axis_fifo_rvalid,       single_gpio_rvalid    }),
+//   .m_axi_rready     ({axis_i2s_rready,          axis_fifo_rready,       single_gpio_rready    })
+
   // Master Interface, connected to the AXI4LITE GPIO IP core.
-  .m_axi_awaddr     ({single_gpio_awaddr    }),
+  .m_axi_awaddr     ({{23'b0,soc_intc_awaddr},  {28'b0,uart_lite_awaddr},   {23'b0,single_gpio_awaddr}}),
   .m_axi_awlen      (),
   .m_axi_awsize     (),
   .m_axi_awburst    (),
@@ -799,17 +989,20 @@ axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
   .m_axi_awprot     (),
   .m_axi_awregion   (),
   .m_axi_awqos      (),
-  .m_axi_awvalid    ({single_gpio_awvalid   }),
-  .m_axi_awready    ({single_gpio_awready   }),
-  .m_axi_wdata      ({single_gpio_wdata     }),
-  .m_axi_wstrb      ({single_gpio_wstrb     }),
+  .m_axi_awvalid    ({soc_intc_awvalid,         uart_lite_awvalid,         single_gpio_awvalid    }),
+  .m_axi_awready    ({soc_intc_awready,         uart_lite_awready,         single_gpio_awready    }),
+
+  .m_axi_wdata      ({soc_intc_wdata,           uart_lite_wdata,           single_gpio_wdata      }),
+  .m_axi_wstrb      ({soc_intc_wstrb,           uart_lite_wstrb,           single_gpio_wstrb      }),
   .m_axi_wlast      (),
-  .m_axi_wvalid     ({single_gpio_wvalid    }),
-  .m_axi_wready     ({single_gpio_wready    }),
-  .m_axi_bresp      ({single_gpio_bresp     }),
-  .m_axi_bvalid     ({single_gpio_bvalid    }),
-  .m_axi_bready     ({single_gpio_bready    }),
-  .m_axi_araddr     ({single_gpio_araddr    }),
+  .m_axi_wvalid     ({soc_intc_wvalid,          uart_lite_wvalid,          single_gpio_wvalid     }),
+  .m_axi_wready     ({soc_intc_wready,          uart_lite_wready,          single_gpio_wready     }),
+
+  .m_axi_bresp      ({soc_intc_bresp,           uart_lite_bresp,           single_gpio_bresp      }),
+  .m_axi_bvalid     ({soc_intc_bvalid,          uart_lite_bvalid,          single_gpio_bvalid     }),
+  .m_axi_bready     ({soc_intc_bready,          uart_lite_bready,          single_gpio_bready     }),
+
+  .m_axi_araddr     ({{23'b0,soc_intc_araddr},  {28'b0,uart_lite_araddr},  {23'b0,single_gpio_araddr}}),
   .m_axi_arlen      (),
   .m_axi_arsize     (),
   .m_axi_arburst    (),
@@ -818,39 +1011,173 @@ axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
   .m_axi_arprot     (),
   .m_axi_arregion   (),
   .m_axi_arqos      (),
-  .m_axi_arvalid    ({single_gpio_arvalid   }),
-  .m_axi_arready    ({single_gpio_arready   }),
-  .m_axi_rdata      ({single_gpio_rdata     }),
-  .m_axi_rresp      ({single_gpio_rresp     }),
-  .m_axi_rlast      ({single_gpio_rvalid    }),
-  .m_axi_rvalid     ({single_gpio_rvalid    }),
-  .m_axi_rready     ({single_gpio_rready    })
+  .m_axi_arvalid    ({soc_intc_arvalid,         uart_lite_arvalid,         single_gpio_arvalid    }),
+  .m_axi_arready    ({soc_intc_arready,         uart_lite_arready,         single_gpio_arready    }),
+
+  .m_axi_rdata      ({soc_intc_rdata,           uart_lite_rdata,           single_gpio_rdata      }),
+  .m_axi_rresp      ({soc_intc_rresp,           uart_lite_rresp,           single_gpio_rresp      }),
+  .m_axi_rlast      ({soc_intc_rvalid,          uart_lite_rvalid,          single_gpio_rvalid     }),
+  .m_axi_rvalid     ({soc_intc_rvalid,          uart_lite_rvalid,          single_gpio_rvalid     }),
+  .m_axi_rready     ({soc_intc_rready,          uart_lite_rready,          single_gpio_rready     })
+
+);
+// // -- PLL 48kHz Audio clk
+//     // Audio clock (MCLK x 2):
+//     // For 44.1KHz: 22.5792MHz
+//     // For 48KHz:   24.576MHz
+// wire aud_mclk;
+// clk_wiz_1 clk_audio_48kHz
+//    (
+//     // Clock out ports
+//     .clk_out1(aud_mclk),
+//    // Clock in ports
+//     .clk_in1(clk));
+    
+// // -- AXI4 LITE I2S TRANSMITTER IP CORE
+// i2s_transmitter_0 axis_i2stx (
+//   .s_axi_ctrl_aclk          (aclk                       ), 
+//   .s_axi_ctrl_aresetn       (aresetn                    ), 
+  
+//   .aud_mclk                 (aud_mclk                   ),
+//   .aud_mrst                 (aresetn                    ),
+  
+//   .s_axis_aud_aclk          (aclk                       ),
+//   .s_axis_aud_aresetn       (aresetn                    ),
+  
+//   .s_axi_ctrl_awvalid       (axis_i2s_awvalid           ), 
+//   .s_axi_ctrl_awready       (axis_i2s_awready           ), 
+//   .s_axi_ctrl_awaddr        (axis_i2s_awaddr            ), 
+  
+//   .s_axi_ctrl_wvalid        (axis_i2s_wvalid            ), 
+//   .s_axi_ctrl_wready        (axis_i2s_wready            ), 
+//   .s_axi_ctrl_wdata         (axis_i2s_wdata             ), 
+  
+//   .s_axi_ctrl_bvalid        (axis_i2s_bvalid            ), 
+//   .s_axi_ctrl_bready        (axis_i2s_bready            ), 
+//   .s_axi_ctrl_bresp         (axis_i2s_bresp             ), 
+  
+//   .s_axi_ctrl_arvalid       (axis_i2s_arvalid           ), 
+//   .s_axi_ctrl_arready       (axis_i2s_arready           ), 
+//   .s_axi_ctrl_araddr        (axis_i2s_araddr            ), 
+  
+//   .s_axi_ctrl_rvalid        (axis_i2s_rvalid            ), 
+//   .s_axi_ctrl_rready        (axis_i2s_rready            ), 
+//   .s_axi_ctrl_rdata         (axis_i2s_rdata             ), 
+//   .s_axi_ctrl_rresp         (axis_i2s_rresp             ),
+  
+//   .irq                      (                           ), 
+  
+//   .lrclk_out                (lrclk_out                  ),
+//   .sclk_out                 (sclk_out                   ),
+//   .sdata_0_out              (sdata_0_out                ),
+  
+//   .s_axis_aud_tdata         (axis_fifo_str_txd_tdata    ),
+//   .s_axis_aud_tid           (axis_fifo_str_txd_tid      ),
+//   .s_axis_aud_tvalid        (axis_fifo_str_txd_tvalid   ),
+//   .s_axis_aud_tready        (axis_fifo_str_txd_tready   )
+// );
+
+// // -- AXI4 LITE FIFO IP CORE
+// axi_fifo_mm_s_0 axis_i2s_fifo (
+//   .interrupt                (                           ),
+  
+//   .s_axi_aclk               (aclk                       ),
+//   .s_axi_aresetn            (aresetn                    ),
+
+//   .s_axi_awaddr             (axis_fifo_awaddr           ),
+//   .s_axi_awvalid            (axis_fifo_awvalid          ),
+//   .s_axi_awready            (axis_fifo_awready          ),
+  
+//   .s_axi_wdata              (axis_fifo_wdata            ),
+//   .s_axi_wstrb              (axis_fifo_wstrb            ),
+//   .s_axi_wvalid             (axis_fifo_wvalid           ),
+//   .s_axi_wready             (axis_fifo_wready           ),
+  
+//   .s_axi_bresp              (axis_fifo_bresp            ),
+//   .s_axi_bvalid             (axis_fifo_bvalid           ),
+//   .s_axi_bready             (axis_fifo_bready           ),
+  
+//   .s_axi_araddr             (axis_fifo_araddr           ),
+//   .s_axi_arvalid            (axis_fifo_arvalid          ),
+//   .s_axi_arready            (axis_fifo_arready          ),
+  
+//   .s_axi_rdata              (axis_fifo_rdata            ),
+//   .s_axi_rresp              (axis_fifo_rresp            ),
+//   .s_axi_rvalid             (axis_fifo_rvalid           ),
+//   .s_axi_rready             (axis_fifo_rready           ),
+  
+//   .mm2s_prmry_reset_out_n   (axis_fifo_prmry_reset_n    ),
+  
+//   .axi_str_txd_tvalid       (axis_fifo_str_txd_tvalid   ),
+//   .axi_str_txd_tready       (axis_fifo_str_txd_tready   ),
+//   .axi_str_txd_tlast        (axis_fifo_str_txd_tlast    ),
+//   .axi_str_txd_tdata        (axis_fifo_str_txd_tdata    ),
+//   .axi_str_txd_tid          (axis_fifo_str_txd_tid      )
+// );
+
+// -- AXI4 LITE UART LITE IP CORE
+axi_uartlite_0 axi_uartlite (
+  .s_axi_aclk               (aclk               ), 
+  .s_axi_aresetn            (aresetn            ), 
+
+  .interrupt                (uart_lite_int      ),  
+
+  .s_axi_awaddr             (uart_lite_awaddr   ),    
+  .s_axi_awvalid            (uart_lite_awvalid  ),  
+  .s_axi_awready            (uart_lite_awready  ),  
+
+  .s_axi_wdata              (uart_lite_wdata    ),      
+  .s_axi_wstrb              (uart_lite_wstrb    ),   
+  .s_axi_wvalid             (uart_lite_wvalid   ),    
+  .s_axi_wready             (uart_lite_wready   ),   
+
+  .s_axi_bresp              (uart_lite_bresp    ),      
+  .s_axi_bvalid             (uart_lite_bvalid   ),     
+  .s_axi_bready             (uart_lite_bready   ),     
+
+  .s_axi_araddr             (uart_lite_araddr   ),   
+  .s_axi_arvalid            (uart_lite_arvalid  ),   
+  .s_axi_arready            (uart_lite_arready  ),   
+
+  .s_axi_rdata              (uart_lite_rdata    ),     
+  .s_axi_rresp              (uart_lite_rresp    ),       
+  .s_axi_rvalid             (uart_lite_rvalid   ),    
+  .s_axi_rready             (uart_lite_rready   ),     
+
+  .rx                       (rx                 ),             
+  .tx                       (tx                 )              
 );
 
-// -- AXI4 LITE GPIO IO Core
+// -- AXI4 LITE GPIO IP Core
 axi_gpio_0 single_gpio_0 (
-  .s_axi_aclk       (aclk                ),
-  .s_axi_aresetn    (aresetn             ),
-  .s_axi_awaddr     (single_gpio_awaddr  ),
-  .s_axi_awvalid    (single_gpio_awvalid ),
-  .s_axi_awready    (single_gpio_awready ),
-  .s_axi_wdata      (single_gpio_wdata   ),
-  .s_axi_wstrb      (single_gpio_wstrb   ),
-  .s_axi_wvalid     (single_gpio_wvalid  ),
-  .s_axi_wready     (single_gpio_wready  ),
-  .s_axi_bresp      (single_gpio_bresp   ),
-  .s_axi_bvalid     (single_gpio_bvalid  ),
-  .s_axi_bready     (single_gpio_bready  ),
-  .s_axi_araddr     (single_gpio_araddr  ),
-  .s_axi_arvalid    (single_gpio_arvalid ),
-  .s_axi_arready    (single_gpio_arready ),
-  .s_axi_rdata      (single_gpio_rdata   ),
-  .s_axi_rresp      (single_gpio_rresp   ),
-  .s_axi_rvalid     (single_gpio_rvalid  ),
-  .s_axi_rready     (single_gpio_rready  ),
-  .gpio_io_i        (single_gpio_io_i    ),
-  .gpio_io_o        (single_gpio_io_o    ),
-  .gpio_io_t        (single_gpio_io_t    )
+  .s_axi_aclk               (aclk                ),
+  .s_axi_aresetn            (aresetn             ),
+
+  .s_axi_awaddr             (single_gpio_awaddr  ),
+  .s_axi_awvalid            (single_gpio_awvalid ),
+  .s_axi_awready            (single_gpio_awready ),
+
+  .s_axi_wdata              (single_gpio_wdata   ),
+  .s_axi_wstrb              (single_gpio_wstrb   ),
+  .s_axi_wvalid             (single_gpio_wvalid  ),
+  .s_axi_wready             (single_gpio_wready  ),
+
+  .s_axi_bresp              (single_gpio_bresp   ),
+  .s_axi_bvalid             (single_gpio_bvalid  ),
+  .s_axi_bready             (single_gpio_bready  ),
+
+  .s_axi_araddr             (single_gpio_araddr  ),
+  .s_axi_arvalid            (single_gpio_arvalid ),
+  .s_axi_arready            (single_gpio_arready ),
+
+  .s_axi_rdata              (single_gpio_rdata   ),
+  .s_axi_rresp              (single_gpio_rresp   ),
+  .s_axi_rvalid             (single_gpio_rvalid  ),
+  .s_axi_rready             (single_gpio_rready  ),
+
+  .gpio_io_i                (single_gpio_io_i    ),
+  .gpio_io_o                (single_gpio_io_o    ),
+  .gpio_io_t                (single_gpio_io_t    )
 );
 
 // ------------------------------------- TOP AXI3 Crossbar -------------------------------------
