@@ -9,6 +9,7 @@ vivado_xpr/project_1/vivado.jou
 
 # Doc
 doc/AXI4L*/
+doc/MIG/
 
 # Xlnx IP Core
 rtl/Xilinx_IP/
@@ -22,7 +23,27 @@ rtl/Xilinx_IP/
 ##  DPRAM 512x32
 !rtl/Xilinx_IP/dpram_512x32/*.xci
 ##  CLK WIZARD 0
+!rtl/Xilinx_IP/clk_wiz_0/*.xci
 ##  CLK PLL 33
-##  AXI4 LITE CROSSBAR
+!rtl/Xilinx_IP/clk_pll_33/*.xci
+##  AXI4 CROSSBAR
+!rtl/Xilinx_IP/axi4lite_crossbar_0/*.xci
 ##  AXI4 LITE UART Lite
+!rtl/Xilinx_IP/axi_uartlite_0/*.xci
 ##  AXI INTERCONNECT
+!rtl/Xilinx_IP/axi_interconnect_0/*.xci
+##  AXI INTC
+!rtl/Xilinx_IP/axi_intc_0/*.xci
+##  AXI GPIO
+!rtl/Xilinx_IP/axi_gpio_0/*.xci
+##  AXI3 CROSSBAR
+!rtl/Xilinx_IP/axi_crossbar_soc/*.xci
+
+## CPU XLNX IP
+rtl/CPU/Xilinx_IP/
+##  BUS INTERFACE
+!rtl/CPU/Xilinx_IP/Bus_Interface/*.xci
+##  DCACHE RAM
+!rtl/CPU/Xilinx_IP/DCache_Ram_IP/*.xci
+##  ICACHE RAM
+!rtl/CPU/Xilinx_IP/ICache_Ram_IP/*.xci

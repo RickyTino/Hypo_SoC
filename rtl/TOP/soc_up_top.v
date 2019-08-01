@@ -645,8 +645,9 @@ wire [5:0]  int_out;
 wire [5:0]  int_n_i;
 
 assign      soc_intc_intr   = {uart_lite_int, uart0_int}; // INTC interrupt input, LSB is the highest priority
-//assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, soc_intc_irq, mac_int};
-assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, uart0_int, mac_int};
+assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, soc_intc_irq, mac_int};
+//                             7      6       5         4           3          2
+//assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, uart0_int, mac_int};
 assign      int_n_i         = ~int_out;
 
 // -- AXI INTC
