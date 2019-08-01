@@ -1,7 +1,7 @@
 /********************MangoMIPS32*******************
 Filename:   Core_Top.v
 Author:     RickyTino
-Version:    v1.1.0
+Version:    v1.1.1
 **************************************************/
 `include "../Config.v"
 `include "../Defines.v"
@@ -31,11 +31,6 @@ module MangoMIPS_Core_Top
 
     output wire [`CacheOp] cacheop,
     output wire [`DataBus] cop_tag
-
-    // output wire [`AddrBus] debug_wb_pc,
-    // output wire [`ByteWEn] debug_wb_wreg,
-    // output wire [`RegAddr] debug_wb_wraddr,
-    // output wire [`DataBus] debug_wb_wrdata
 );
 
     wire [`AddrBus] if_pcp4;
@@ -145,10 +140,11 @@ module MangoMIPS_Core_Top
     wire [`DataBus] mem_m_wdata;
     wire [`DataBus] mem_m_rdata;
     wire [`AXISize] mem_m_size;
+    wire            mem_m_refs;
 
     wire            dtlb_en;
     wire [`AddrBus] dtlb_vaddr;
-    wire            dtlb_refs;
+    // wire            dtlb_refs;
     wire            dtlb_rdy;
     wire [`AddrBus] dtlb_paddr;
     wire            dtlb_cat;
@@ -236,36 +232,38 @@ module MangoMIPS_Core_Top
         .i_en       (if_i_en    )
     );
 
-    MMU mmu_inst (
-        .en         (if_i_en    ),
-        .wen        (`WrDisable ),
-        .vaddr      (if_i_vaddr ),
-        .wdata      (`ZeroWord  ),
-        .rdata      (if_i_rdata ),
-        .size       (`ASize_Word   ),
+    // MMU mmu_inst (
+    //     .en         (if_i_en    ),
+    //     .wen        (`WrDisable ),
+    //     .vaddr      (if_i_vaddr ),
+    //     .wdata      (`ZeroWord  ),
+    //     .rdata      (if_i_rdata ),
+    //     .size       (`ASize_Word),
 
-        .bus_en     (ibus_en    ),
-        .bus_paddr  (ibus_addr  ),
-        .bus_rdata  (ibus_rdata ),
-        .bus_streq  (ibus_streq ),
-        .bus_cached (ibus_cached),
+    //     .bus_en     (ibus_en    ),
+    //     .bus_paddr  (ibus_addr  ),
+    //     .bus_rdata  (ibus_rdata ),
+    //     .bus_streq  (ibus_streq ),
+    //     .bus_cached (ibus_cached),
 
-        .tlb_en     (itlb_en    ),
-        .tlb_vaddr  (itlb_vaddr ),
-        .tlb_rdy    (itlb_rdy   ),
-        .tlb_paddr  (itlb_paddr ),
-        .tlb_cat    (itlb_cat   ),
-        .tlb_tlbr   (i_tlbr     ),
-        .tlb_tlbi   (i_tlbi     ),
-        .tlb_tlbm   (`false     ),
+    //     .tlb_en     (itlb_en    ),
+    //     .tlb_vaddr  (itlb_vaddr ),
+    //     .tlb_rdy    (itlb_rdy   ),
+    //     .tlb_paddr  (itlb_paddr ),
+    //     .tlb_cat    (itlb_cat   ),
+    //     .tlb_tlbr   (i_tlbr     ),
+    //     .tlb_tlbi   (i_tlbi     ),
+    //     .tlb_tlbm   (`false     ),
 
-        .exc_flag   (exc_flag   ),
-        .cp0_Status (cp0_Status ), 
-        .cp0_Config (cp0_Config ),
-        .exc_tlbr   (exc_i_tlbr ),
-        .exc_tlbi   (exc_i_tlbi ),
-        .stallreq   (streq[`IF] )
-    );
+    //     .exc_flag   (exc_flag   ),
+    //     .cp0_Status (cp0_Status ), 
+    //     .cp0_Config (cp0_Config ),
+    //     .exc_tlbr   (exc_i_tlbr ),
+    //     .exc_tlbi   (exc_i_tlbi ),
+    //     .stallreq   (streq[`IF] )
+    // );
+
+    
 
     Reg_IF_ID reg_if_id (
         .clk            (clk        ),
@@ -276,7 +274,7 @@ module MangoMIPS_Core_Top
 
         .if_pc          (if_i_vaddr ),
         .if_pcp4        (if_pcp4    ),
-        .if_inst        (ibus_rdata ),
+        .if_inst        (if_i_rdata ),
         .if_excp        (if_excp    ),
 
         .id_isbranch    (id_isbranch),
@@ -494,41 +492,42 @@ module MangoMIPS_Core_Top
         .mem_null       (mem_null       )
     );
     
-    MMU mmu_data (
-        .en         (mem_m_en   ),
-        .wen        (mem_m_wen  ),
-        .vaddr      (mem_m_vaddr),
-        .wdata      (mem_m_wdata),
-        .rdata      (mem_m_rdata),
-        .size       (mem_m_size ),
+    // MMU mmu_data (
+    //     .en         (mem_m_en   ),
+    //     .wen        (mem_m_wen  ),
+    //     .vaddr      (mem_m_vaddr),
+    //     .wdata      (mem_m_wdata),
+    //     .rdata      (mem_m_rdata),
+    //     .size       (mem_m_size ),
+    //     .refs       (mem_m_refs ),
 
-        .bus_en     (dbus_en    ),
-        .bus_paddr  (dbus_addr  ),
-        .bus_rdata  (dbus_rdata ),
-        .bus_wen    (dbus_wen   ),
-        .bus_wdata  (dbus_wdata ),
-        .bus_size   (dbus_size  ),
-        .bus_streq  (dbus_streq ),
-        .bus_cached (dbus_cached),
+    //     .bus_en     (dbus_en    ),
+    //     .bus_paddr  (dbus_addr  ),
+    //     .bus_rdata  (dbus_rdata ),
+    //     .bus_wen    (dbus_wen   ),
+    //     .bus_wdata  (dbus_wdata ),
+    //     .bus_size   (dbus_size  ),
+    //     .bus_streq  (dbus_streq ),
+    //     .bus_cached (dbus_cached),
 
-        .tlb_en     (dtlb_en    ),
-        .tlb_vaddr  (dtlb_vaddr ),
-        .tlb_refs   (dtlb_refs  ),
-        .tlb_rdy    (dtlb_rdy   ),
-        .tlb_paddr  (dtlb_paddr ),
-        .tlb_cat    (dtlb_cat   ),
-        .tlb_tlbr   (d_tlbr     ),
-        .tlb_tlbi   (d_tlbi     ),
-        .tlb_tlbm   (d_tlbm     ),
+    //     .tlb_en     (dtlb_en    ),
+    //     .tlb_vaddr  (dtlb_vaddr ),
+    //     // .tlb_refs   (dtlb_refs  ),
+    //     .tlb_rdy    (dtlb_rdy   ),
+    //     .tlb_paddr  (dtlb_paddr ),
+    //     .tlb_cat    (dtlb_cat   ),
+    //     .tlb_tlbr   (d_tlbr     ),
+    //     .tlb_tlbi   (d_tlbi     ),
+    //     .tlb_tlbm   (d_tlbm     ),
 
-        .exc_flag   (exc_flag   ),
-        .cp0_Status (cp0_Status ),
-        .cp0_Config (cp0_Config ),
-        .exc_tlbr   (exc_d_tlbr ),
-        .exc_tlbi   (exc_d_tlbi ),
-        .exc_tlbm   (exc_d_tlbm ),
-        .stallreq   (streq[`MEM])
-    );
+    //     .exc_flag   (exc_flag   ),
+    //     .cp0_Status (cp0_Status ),
+    //     .cp0_Config (cp0_Config ),
+    //     .exc_tlbr   (exc_d_tlbr ),
+    //     .exc_tlbi   (exc_d_tlbi ),
+    //     .exc_tlbm   (exc_d_tlbm ),
+    //     .stallreq   (streq[`MEM])
+    // );
     
     ALU_MEM alu_mem (
         .aluop     (mem_aluop   ),
@@ -557,7 +556,7 @@ module MangoMIPS_Core_Top
         .d_tlbr     (exc_d_tlbr ),
         .d_tlbi     (exc_d_tlbi ),
         .d_tlbm     (exc_d_tlbm ),
-        .d_refs     (dtlb_refs  ),
+        .d_refs     (mem_m_refs ),
         .exc_intr   (exc_intr   ),
         .pc         (mem_pc     ),
         .m_en       (mem_m_en   ),
@@ -602,8 +601,6 @@ module MangoMIPS_Core_Top
         .Cause_o    (cp0_Cause      ),
         .EPC_o      (cp0_EPC        ),
         .Config_o   (cp0_Config     ),
-        // .ITagLo_o   (cop_itag       ),
-        // .DTagLo_o   (cop_dtag       ),
         .TagLo_o    (cop_tag        ),
         .ErrorEPC_o (cp0_ErrorEPC   ),
 
@@ -682,11 +679,125 @@ module MangoMIPS_Core_Top
         .flush_pc       (exc_newpc      )
     );
 
-`ifndef Fixed_Mapping_MMU
+// `ifndef Fixed_Mapping_MMU
+
+//     TLBU tlb (
+//         .clk        (clk            ),
+//         .rst        (rst            ),
+//         .tlb_op     (mem_tlbop      ),
+//         .Index      (cp0_Index      ),
+//         .Random     (cp0_Random     ),
+//         .EntryLo0   (cp0_EntryLo0   ),
+//         .EntryLo1   (cp0_EntryLo1   ),
+//         .PageMask   (cp0_PageMask   ),
+//         .EntryHi    (cp0_EntryHi    ),
+//         .immu_en    (itlb_en        ),
+//         .immu_vaddr (itlb_vaddr     ),
+//         .immu_rdy   (itlb_rdy       ),
+//         .immu_paddr (itlb_paddr     ),
+//         .immu_cat   (itlb_cat       ),
+//         .immu_stall (stall[`IF]     ),
+//         .dmmu_en    (dtlb_en        ),
+//         .dmmu_vaddr (dtlb_vaddr     ),
+//         .dmmu_refs  (mem_m_refs     ),
+//         .dmmu_rdy   (dtlb_rdy       ),
+//         .dmmu_paddr (dtlb_paddr     ),
+//         .dmmu_cat   (dtlb_cat       ),
+//         .dmmu_stall (stall[`MEM]    ),
+//         .cp0_idxwen (cp0_idxwen     ),
+//         .cp0_wIndex (cp0_tlbidx     ),
+//         .cp0_tlbwen (cp0_itmwen     ),
+//         .cp0_tlbitm (cp0_tlbitm     ),
+//         .i_tlbr     (i_tlbr         ),
+//         .i_tlbi     (i_tlbi         ),
+//         .d_tlbr     (d_tlbr         ),
+//         .d_tlbi     (d_tlbi         ),
+//         .d_tlbm     (d_tlbm         )
+//     );
+
+// `endif
+
+    // TLB Test Area 
+    wire         itlb_wen,   dtlb_wen;
+    wire [`STLB] itlb_wdata, dtlb_wdata;
+    wire         itlb_inv,   dtlb_inv;
+
+    MMU mmu_inst (
+        .clk        (clk        ),
+        .rst_n      (!rst       ),
+
+        .en         (if_i_en    ),
+        .wen        (`WrDisable ),
+        .vaddr      (if_i_vaddr ),
+        .wdata      (`ZeroWord  ),
+        .rdata      (if_i_rdata ),
+        .size       (`ASize_Word),
+
+        .bus_en     (ibus_en    ),
+        .bus_paddr  (ibus_addr  ),
+        .bus_rdata  (ibus_rdata ),
+        .bus_streq  (ibus_streq ),
+        .bus_cached (ibus_cached),
+
+        .tlb_en     (itlb_en    ),
+        .tlb_vaddr  (itlb_vaddr ),
+        .stlb_wen   (itlb_wen   ),
+        .stlb_wdata (itlb_wdata ),
+        .stlb_inv   (itlb_inv   ),
+        .tlb_tlbr   (i_tlbr     ),
+        .tlb_tlbi   (i_tlbi     ),
+
+        .exc_flag   (exc_flag   ),
+        .Status     (cp0_Status ), 
+        .Config     (cp0_Config ),
+        .EntryHi    (cp0_EntryHi),
+        .exc_tlbr   (exc_i_tlbr ),
+        .exc_tlbi   (exc_i_tlbi ),
+        .stallreq   (streq[`IF] )
+    );
+
+    MMU mmu_data (
+        .clk        (clk        ),
+        .rst_n      (!rst       ),
+
+        .en         (mem_m_en   ),
+        .wen        (mem_m_wen  ),
+        .vaddr      (mem_m_vaddr),
+        .wdata      (mem_m_wdata),
+        .rdata      (mem_m_rdata),
+        .size       (mem_m_size ),
+        .refs       (mem_m_refs ),
+
+        .bus_en     (dbus_en    ),
+        .bus_paddr  (dbus_addr  ),
+        .bus_rdata  (dbus_rdata ),
+        .bus_wen    (dbus_wen   ),
+        .bus_wdata  (dbus_wdata ),
+        .bus_size   (dbus_size  ),
+        .bus_streq  (dbus_streq ),
+        .bus_cached (dbus_cached),
+
+        .tlb_en     (dtlb_en    ),
+        .tlb_vaddr  (dtlb_vaddr ),
+        .stlb_wen   (dtlb_wen   ),
+        .stlb_wdata (dtlb_wdata ),
+        .stlb_inv   (dtlb_inv   ),
+        .tlb_tlbr   (d_tlbr     ),
+        .tlb_tlbi   (d_tlbi     ),
+
+        .exc_flag   (exc_flag   ),
+        .Status     (cp0_Status ),
+        .Config     (cp0_Config ),
+        .EntryHi    (cp0_EntryHi),
+        .exc_tlbr   (exc_d_tlbr ),
+        .exc_tlbi   (exc_d_tlbi ),
+        .exc_tlbm   (exc_d_tlbm ),
+        .stallreq   (streq[`MEM])
+    );
 
     TLBU tlb (
         .clk        (clk            ),
-        .rst        (rst            ),
+        .rst_n      (!rst           ),
         .tlb_op     (mem_tlbop      ),
         .Index      (cp0_Index      ),
         .Random     (cp0_Random     ),
@@ -696,33 +807,25 @@ module MangoMIPS_Core_Top
         .EntryHi    (cp0_EntryHi    ),
         .immu_en    (itlb_en        ),
         .immu_vaddr (itlb_vaddr     ),
-        .immu_rdy   (itlb_rdy       ),
-        .immu_paddr (itlb_paddr     ),
-        .immu_cat   (itlb_cat       ),
+        .immu_wen   (itlb_wen       ),
+        .immu_wdata (itlb_wdata     ),
+        .immu_inv   (itlb_inv       ),
         .immu_stall (stall[`IF]     ),
         .dmmu_en    (dtlb_en        ),
         .dmmu_vaddr (dtlb_vaddr     ),
-        .dmmu_refs  (dtlb_refs      ),
-        .dmmu_rdy   (dtlb_rdy       ),
-        .dmmu_paddr (dtlb_paddr     ),
-        .dmmu_cat   (dtlb_cat       ),
+        // .dmmu_refs  (mem_m_refs     ),
+        .dmmu_wen   (dtlb_wen       ),
+        .dmmu_wdata (dtlb_wdata     ),
+        .dmmu_inv   (dtlb_inv       ),
         .dmmu_stall (stall[`MEM]    ),
         .cp0_idxwen (cp0_idxwen     ),
-        .cp0_wIndex (cp0_tlbidx     ),
+        .cp0_windex (cp0_tlbidx     ),
         .cp0_tlbwen (cp0_itmwen     ),
         .cp0_tlbitm (cp0_tlbitm     ),
         .i_tlbr     (i_tlbr         ),
         .i_tlbi     (i_tlbi         ),
         .d_tlbr     (d_tlbr         ),
-        .d_tlbi     (d_tlbi         ),
-        .d_tlbm     (d_tlbm         )
+        .d_tlbi     (d_tlbi         )
     );
 
-`endif
-
-    // assign debug_wb_pc     = wb_pc;
-    // assign debug_wb_wreg   = wb_wreg;
-    // assign debug_wb_wraddr = wb_wraddr;
-    // assign debug_wb_wrdata = wb_wrdata;
-    
 endmodule

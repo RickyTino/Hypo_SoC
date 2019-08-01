@@ -1,12 +1,13 @@
 /********************MangoMIPS32*******************
 Filename:   DCache_Controller.v
 Author:     RickyTino
-Version:    v1.0.1
+Version:    v1.1.1
 **************************************************/
 `include "../Config.v"
 `include "../Defines.v"
 
-module DCache_Controller (
+module DCache_Controller
+(
     input  wire            aclk,
     input  wire            aresetn,
     output reg  [  3 : 0 ] arid,

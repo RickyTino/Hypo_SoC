@@ -1,7 +1,7 @@
 /********************MangoMIPS32*******************
 Filename:   CP0.v
 Author:     RickyTino
-Version:    v1.1.0
+Version:    v1.1.1
 **************************************************/
 `include "../Config.v"
 `include "../Defines.v"
@@ -92,7 +92,7 @@ module CP0
     reg          Cause_BD;
     reg  [ 1: 0] Cause_CE;
     reg          Cause_IV;
-    (*mark_debug = "true"*) reg  [ 7: 0] Cause_IP;
+    reg  [ 7: 0] Cause_IP;
     reg  [ 4: 0] Cause_ExcCode;
     wire [`Word] Cause = {
         Cause_BD,       // 31 R
@@ -117,7 +117,7 @@ module CP0
         8'h00,          // Company Options
         8'h01,          // Company ID
         8'h80,          // Processor ID
-        8'h66           // Revision
+        8'h00           // Revision
     };
     // 32'h00004220; //LS232
 
@@ -365,7 +365,7 @@ module CP0
                     `ExcT_Trap: Cause_ExcCode <= `ExcC_Tr;
                     `ExcT_SysC: Cause_ExcCode <= `ExcC_SysC;
                     `ExcT_Bp:   Cause_ExcCode <= `ExcC_Bp;
-                    `ExcT_AdE:  Cause_ExcCode <= exc_save ? `ExcC_AdEL : `ExcC_AdES;
+                    `ExcT_AdE:  Cause_ExcCode <= exc_save ? `ExcC_AdES : `ExcC_AdEL;
                     `ExcT_TLBR: Cause_ExcCode <= exc_save ? `ExcC_TLBS : `ExcC_TLBL;
                     `ExcT_TLBI: Cause_ExcCode <= exc_save ? `ExcC_TLBS : `ExcC_TLBL;
                     `ExcT_TLBM: Cause_ExcCode <= `ExcC_Mod;

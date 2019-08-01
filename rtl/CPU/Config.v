@@ -1,13 +1,13 @@
 /********************MangoMIPS32*******************
 Filename:   Config.v
 Author:     RickyTino
-Version:    v1.0.1
+Version:    v1.1.1
 **************************************************/
 
 // Note: The result is UNPREDICTABLE if values are set out of the range indicated.
 // To disable a macro definition, add a "_" to the name or simply comment it out. 
 
-//------------------------Privilege Options------------------------
+//------------------------CP0 Options------------------------
 // Define "Disable_User_Mode" to keep processor working under kernel mode regardless
 // of Status.UM bit.
 `define Disable_User_Mode
@@ -19,7 +19,7 @@ Version:    v1.0.1
 //------------------------NSCSCC Options------------------------
 // Define "Reset_Cacheable" to set the reset state of Config.K0/KU/K23 to a cacheable
 // state (value 3'd3).
-`define _Reset_Cacheable
+`define Reset_Cacheable
 
 // Define "IF_Force_Cached" to set the cacheability of all instruction fetch
 // to a cacheable state.
@@ -39,12 +39,12 @@ Version:    v1.0.1
 // Cache_N    | 0       1       2       3       4       5       6
 // Note that the result is UNPREDICTABLE if this value is set different from the
 // actual size of the implemented cache memory.
-`define     ICache_N     3
-`define     DCache_N     3
+`define     ICache_N     2
+`define     DCache_N     2
 
 //------------------------Simulation Options------------------------
 // Define "Output_Exception_Info" to output exception information to console during
 // simulation when exceptions occur.
-`define _Output_Exception_Info
+`define Output_Exception_Info
 
 //------------------------------------------------

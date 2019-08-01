@@ -1,12 +1,13 @@
 /********************MangoMIPS32*******************
 Filename:   DCache_Ram.v
 Author:     RickyTino
-Version:    v1.0.1
+Version:    v1.1.1
 **************************************************/
 `include "../Config.v"
 `include "../Defines.v"
 
-module DCache_Ram (
+module DCache_Ram
+(
     input  wire             clk,
     input  wire             enb,
     input  wire [`ByteWEn]  wea,  web,

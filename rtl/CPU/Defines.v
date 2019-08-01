@@ -1,9 +1,8 @@
 /********************MangoMIPS32*******************
 Filename:   Defines.v
 Author:     RickyTino
-Version:    v1.0.1
+Version:    v1.1.1
 **************************************************/
-// `include "../Config.v"
 
 /*--------------------Constant--------------------*/
 // Width constant
@@ -351,10 +350,6 @@ Version:    v1.0.1
 `define         CP0_EBase           {5'd15, 3'd1}
 `define         CP0_Config          {5'd16, 3'd0}
 `define         CP0_Config1         {5'd16, 3'd1}
-// `define         CP0_ITagLo          {5'd28, 3'd0}
-// `define         CP0_DTagLo          {5'd28, 3'd2}
-// `define         CP0_ITagHi          {5'd29, 3'd0}
-// `define         CP0_DTagHi          {5'd29, 3'd2}
 `define         CP0_TagLo           {5'd28, 3'd0}
 `define         CP0_TagHi           {5'd29, 3'd0}
 `define         CP0_ErrorEPC        {5'd30, 3'd0}
@@ -511,3 +506,15 @@ Version:    v1.0.1
 `define         ExcC_Tr             5'h0D
 
 /*--------------------End of Defines--------------------*/
+
+`define         STLB_W          74
+`define         STLB            `STLB_W-1:0
+
+`define         STLB_VPN        19: 0
+`define         STLB_PFN        39:20
+`define         STLB_Mask       59:40
+`define         STLB_ASID       67:60
+`define         STLB_G          68
+`define         STLB_V          69
+`define         STLB_D          70
+`define         STLB_C          73:71

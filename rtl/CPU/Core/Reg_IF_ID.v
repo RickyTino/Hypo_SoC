@@ -1,7 +1,7 @@
 /********************MangoMIPS32*******************
 Filename:   Reg_IF_ID.v
 Author:     RickyTino
-Version:    v1.1.0
+Version:    v1.1.1
 **************************************************/
 `include "../Config.v"
 `include "../Defines.v"
@@ -14,9 +14,9 @@ module Reg_IF_ID
     input  wire            flush,
     input  wire            clrslot,
 
-    (*mark_debug = "true"*) input  wire [`AddrBus] if_pc,
+    input  wire [`AddrBus] if_pc,
     input  wire [`AddrBus] if_pcp4,
-    (*mark_debug = "true"*) input  wire [`DataBus] if_inst,
+    input  wire [`DataBus] if_inst,
     input  wire [`ExcBus ] if_excp,
     input  wire            id_isbranch,
 
