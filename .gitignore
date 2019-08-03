@@ -11,6 +11,7 @@ vivado_xpr/project_1/vivado.jou
 doc/AXI4L*/
 doc/MIG/
 doc/Sensor_Kit/
+doc/7Q-TEK_QT18B20/
 
 # Xlnx IP Core
 rtl/Xilinx_IP/
