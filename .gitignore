@@ -10,6 +10,7 @@ vivado_xpr/project_1/vivado.jou
 # Doc
 doc/AXI4L*/
 doc/MIG/
+doc/Sensor_Kit/
 
 # Xlnx IP Core
 rtl/Xilinx_IP/
