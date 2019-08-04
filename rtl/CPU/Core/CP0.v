@@ -92,7 +92,7 @@ module CP0
     reg          Cause_BD;
     reg  [ 1: 0] Cause_CE;
     reg          Cause_IV;
-    (*mark_debug = "true"*) reg  [ 7: 0] Cause_IP;
+    reg  [ 7: 0] Cause_IP;
     reg  [ 4: 0] Cause_ExcCode;
     wire [`Word] Cause = {
         Cause_BD,       // 31 R

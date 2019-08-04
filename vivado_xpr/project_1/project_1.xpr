@@ -529,6 +529,11 @@
           <Attr Name="ScopedToCell" Val="mig_axi_32"/>
         </FileInfo>
       </File>
+      <File Path="$PPRDIR/../../rtl/Xilinx_IP/mig_axi_32/mig_b.prj">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+        </FileInfo>
+      </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
         <Option Name="TopModule" Val="soc_up_top"/>
