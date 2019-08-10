@@ -25,12 +25,12 @@ set_property PACKAGE_PIN L23 [get_ports {GPIO16_pins[12]}]
 set_property PACKAGE_PIN L22 [get_ports {GPIO16_pins[13]}]
 set_property PACKAGE_PIN M24 [get_ports {GPIO16_pins[14]}]
 set_property PACKAGE_PIN L20 [get_ports {GPIO16_pins[15]}]
-set_property PACKAGE_PIN M22 [get_ports rx]
-set_property PACKAGE_PIN N24 [get_ports tx]
 
 #GPIO Unused Pins FPGA_EXT_IO18-31
-#set_property PACKAGE_PIN N23
-#set_property PACKAGE_PIN N22
+set_property PACKAGE_PIN M22 [get_ports rx]
+set_property PACKAGE_PIN N24 [get_ports tx]
+set_property PACKAGE_PIN N23 [get_ports pwm_0]
+set_property PACKAGE_PIN N22 [get_ports pwm_1]
 #set_property PACKAGE_PIN M21
 #set_property PACKAGE_PIN N21
 #set_property PACKAGE_PIN M20
@@ -47,6 +47,8 @@ set_property PACKAGE_PIN N24 [get_ports tx]
 set_property IOSTANDARD LVCMOS33 [get_ports {GPIO16_pins[*]}]
 set_property IOSTANDARD LVCMOS33 [get_ports rx]
 set_property IOSTANDARD LVCMOS33 [get_ports tx]
+set_property IOSTANDARD LVCMOS33 [get_ports pwm_0]
+set_property IOSTANDARD LVCMOS33 [get_ports pwm_1]
 
 #LCD & TS
 set_property PACKAGE_PIN J25 [get_ports lcd_rst]
