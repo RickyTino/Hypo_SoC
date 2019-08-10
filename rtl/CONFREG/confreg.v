@@ -31,16 +31,18 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 ------------------------------------------------------------------------------*/
 
-`define ORDER_REG_ADDR 16'h1160   //32'hbfd0_1160
-`define LED_ADDR       16'hf000   //32'hbfd0_f000 
-`define LED_RG0_ADDR   16'hf004   //32'hbfd0_f004 
-`define LED_RG1_ADDR   16'hf008   //32'hbfd0_f008 
-`define NUM_ADDR       16'hf010   //32'hbfd0_f010 
-`define SWITCH_ADDR    16'hf020   //32'hbfd0_f020 
-`define BTN_KEY_ADDR   16'hf024   //32'hbfd0_f024
-`define BTN_STEP_ADDR  16'hf028   //32'hbfd0_f028
-`define TIMER_ADDR     16'he000   //32'hbfd0_e000
-`define DOT_ADDR       16'hf040   //32'hbfd0_f040 - f05C
+`define ORDER_REG_ADDR  16'h1160   //32'hbfd0_1160
+`define LED_ADDR        16'hf000   //32'hbfd0_f000 
+`define LED_RG0_ADDR    16'hf004   //32'hbfd0_f004 
+`define LED_RG1_ADDR    16'hf008   //32'hbfd0_f008 
+`define NUM_ADDR        16'hf010   //32'hbfd0_f010 
+`define SWITCH_ADDR     16'hf020   //32'hbfd0_f020 
+`define BTN_KEY_ADDR    16'hf024   //32'hbfd0_f024
+`define BTN_STEP_ADDR   16'hf028   //32'hbfd0_f028
+`define TIMER_ADDR      16'he000   //32'hbfd0_e000
+`define DOT_ADDR        16'hf040   //32'hbfd0_f040 - f05C
+`define PWM0_ADDR       16'hff14
+`define PWM1_ADDR       16'hff18
 
 module confreg(
     aclk,
@@ -106,7 +108,11 @@ module confreg(
     switch,
     btn_key_col,
     btn_key_row,
-    btn_step
+    btn_step,
+
+    // -- PWM
+    pwm0_out,
+    pwm1_out
 );
     input           aclk;
     input           aresetn;
@@ -173,6 +179,13 @@ module confreg(
     input      [3 :0] btn_key_row;
     input      [1 :0] btn_step;
 
+// -- PWM Modules
+    output pwm0_out;
+    output pwm1_out;
+
+reg [31:0] pwm0_compare;
+reg [31:0] pwm1_compare;
+
 //
 reg  [31:0] led_data;
 reg  [31:0] led_rg0_data;
@@ -183,6 +196,7 @@ wire [31:0] btn_key_data;
 wire [31:0] btn_step_data;
 reg  [31:0] timer;
 reg  [ 7:0] dot_data [7:0];
+reg  [31:0] pwm_ct;
 
 reg [31:0] cr00,cr01,cr02,cr03,cr04,cr05,cr06,cr07;
 reg busy,write,R_or_W;
@@ -280,6 +294,8 @@ wire [31:0] rdata_d = buf_addr[15:2]         == 14'd0 ? cr00 :
                        buf_addr[15:2]         == 14'd5 ? cr05 :
                        buf_addr[15:2]         == 14'd6 ? cr06 :
                        buf_addr[15:2]         == 14'd7 ? cr07 :
+                       buf_addr[15:0]         == `PWM0_ADDR      ? pwm0_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `PWM1_ADDR      ? pwm1_compare   : // Read for our compare value.
                        buf_addr[15:0]         == `ORDER_REG_ADDR ? order_addr_reg : 
                        buf_addr[15:0]         == `LED_ADDR       ? led_data       :
                        buf_addr[15:0]         == `LED_RG0_ADDR   ? led_rg0_data   :
@@ -770,4 +786,82 @@ begin
 end
 
 //--------------------------------------{dot}end------------------------//
+// -- PWM 0
+wire write_pwm0 = w_enter & (buf_addr[15:0]==`PWM0_ADDR);
+PWM pwm0(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm0_compare),
+    .pwm_out(pwm0_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm0_compare <= 32'h0;
+    end
+    else if(write_pwm0)
+    begin
+        pwm0_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM 1
+wire write_pwm1 = w_enter & (buf_addr[15:0]==`PWM1_ADDR);
+PWM pwm1(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm1_compare),
+    .pwm_out(pwm1_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm1_compare <= 32'h0;
+    end
+    else if(write_pwm1)
+    begin
+        pwm1_compare <= s_wdata[31:0];
+    end
+end
+
+endmodule
+
+// Module PWM
+//  For 66Mhz - a 50Hz PWM signal is 1,320,000 counter.
+//  counter = 0.02 * freq
+module PWM (
+	input clk,
+	input rst_n,
+	input [31:0] compare,
+	output pwm_out
+);
+	reg [31:0] counter;
+    reg [31:0] counter_syn;
+	reg pwm_d;
+	
+	assign pwm_out = pwm_d;
+	
+	always@(posedge clk) begin
+        // reset
+		if(!rst_n) counter <= 0;
+        // keep counting until 1,320,000
+		else if(counter < 32'd1_319_999) counter <= counter + 1;
+        // at last reset the counter.
+		else counter <= 0;
+	end
+
+    always@(posedge clk) begin
+        counter_syn <= counter;
+	end
+	
+    // PWM standard.
+	always@(posedge clk) begin
+		if(!rst_n) pwm_d <= 0;
+		else if(compare > counter_syn)
+			pwm_d <= 1;
+		else
+			pwm_d <= 0;
+	end
+
 endmodule

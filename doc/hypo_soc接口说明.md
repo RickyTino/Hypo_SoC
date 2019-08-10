@@ -81,6 +81,7 @@ LCD控制器的地址空间分为两部分：LCD_RAM与控制寄存器。
 - 8x8点阵:     0x1fd0f040 - f05C, 8个低8位有效的32位寄存器，
   - 从左到右，每列是一个字节，低位在上，高位在下
 - 定时器:      0x1fd0e000 按CPU时钟的频率递增的定时器
+- PWM0:    0x1fd0ff14 写 Compare
 
 ## 四、杂项
 - 原SoC_up使用的是龙芯的AXI_SLAVE模块作为AXI总线桥，已更换为扩展性更好的Xilinx AXI Crossbar IP核

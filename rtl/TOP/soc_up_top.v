@@ -41,6 +41,8 @@ module soc_up_top(
     inout  [15:0] GPIO16_pins,
     input rx,
     output tx,
+    output pwm_0,
+    output pwm_1,
 
 
     output [15:0] led,
@@ -1200,7 +1202,11 @@ confreg CONFREG(
 .switch            (switch      ),
 .btn_key_col       (btn_key_col ),
 .btn_key_row       (btn_key_row ),
-.btn_step          (btn_step    )
+.btn_step          (btn_step    ),
+
+// -- PWM0
+.pwm0_out          (pwm_0       ),
+.pwm1_out          (pwm_1       )
 );
 
 //MAC top
