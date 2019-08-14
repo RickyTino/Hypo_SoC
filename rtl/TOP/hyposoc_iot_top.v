@@ -159,6 +159,7 @@ module hyposoc_iot_top(
     wire            aclk;
     wire            aresetn;
     wire            cpu_clk;
+    wire   c1_clk_ref_i;
 
     assign aclk =   cpu_clk;
 
@@ -697,14 +698,15 @@ module hyposoc_iot_top(
     wire [31:0] hyposoc_intr;
 
     wire [5:0]  int_out;
+    
+    assign      soc_intc_intr   = {uart_lite_int, uart0_int};   // INTC interrupt input, LSB is the highest priority
+    assign      hyposoc_intr    = {31'b0, uart_lite_int};       // INTC interrupt input, LSB is the highest priority
 
 `ifdef CONFIG_USE_XLNX_AXI_INTC
-    assign      soc_intc_intr   = {uart_lite_int, uart0_int};   // INTC interrupt input, LSB is the highest priority
     // Hypothetic MIPS CauseIP     7     6        5         4           3             2
     assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, soc_intc_irq, mac_int};
 `else
 `define CONFIG_USE_CONFREG_INTC
-    assign      hyposoc_intr    = {31'b0, uart_lite_int};       // INTC interrupt input, LSB is the highest priority
     // Hypothetic MIPS CauseIP     7     6        5         4           3          2
     assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, uart0_int, mac_int};
 `endif
@@ -1380,7 +1382,7 @@ module hyposoc_iot_top(
     **/
     // -- WIRE NET TYPE
     wire   c1_sys_clk_i;
-    wire   c1_clk_ref_i;
+    // wire   c1_clk_ref_i;
     wire   c1_sys_rst_i;
     wire   c1_calib_done;
     wire   c1_clk0;

@@ -849,7 +849,7 @@ begin
 end
 // -- PWM 2
 wire write_pwm2 = w_enter & (buf_addr[15:0]==`PWM2_ADDR);
-PWM pwm1(
+PWM pwm2(
     .clk(aclk),
     .rst_n(aresetn),
     .compare(pwm2_compare),
@@ -868,7 +868,7 @@ begin
 end
 // -- PWM 3
 wire write_pwm3 = w_enter & (buf_addr[15:0]==`PWM3_ADDR);
-PWM pwm1(
+PWM pwm3(
     .clk(aclk),
     .rst_n(aresetn),
     .compare(pwm3_compare),
