@@ -1,14 +1,15 @@
 #set_property SEVERITY {Warning} [get_drc_checks RTSTAT-2]
-#时钟信号连接
+
+# Clocking
 #create_clock -period 10.000 [get_ports clk]
 set_property PACKAGE_PIN AC19 [get_ports clk]
 set_property CLOCK_DEDICATED_ROUTE BACKBONE [get_nets clk]
 create_clock -period 10.000 -name clk -waveform {0.000 5.000} [get_ports clk]
 
-#reset
+# Reset
 set_property PACKAGE_PIN Y3 [get_ports resetn]
 
-#GPIO FPGA_EXT_IO0-15
+# ---- GPIO Pins FPGA_EXT_IO0-15
 set_property PACKAGE_PIN M25 [get_ports {GPIO16_pins[0]}]
 set_property PACKAGE_PIN P25 [get_ports {GPIO16_pins[1]}]
 set_property PACKAGE_PIN R26 [get_ports {GPIO16_pins[2]}]
@@ -26,15 +27,15 @@ set_property PACKAGE_PIN L22 [get_ports {GPIO16_pins[13]}]
 set_property PACKAGE_PIN M24 [get_ports {GPIO16_pins[14]}]
 set_property PACKAGE_PIN L20 [get_ports {GPIO16_pins[15]}]
 
-#GPIO Unused Pins FPGA_EXT_IO16-31
+# ---- GPIO Pins FPGA_EXT_IO16-31
 set_property PACKAGE_PIN M22 [get_ports rx]
 set_property PACKAGE_PIN N24 [get_ports tx]
 set_property PACKAGE_PIN N23 [get_ports pwm_0]
 set_property PACKAGE_PIN N22 [get_ports pwm_1]
-#set_property PACKAGE_PIN M21 [get_ports pwm_2]
-#set_property PACKAGE_PIN N21 [get_ports pwm_3]
-set_property PACKAGE_PIN M20 [get_ports i2c_sda]
-set_property PACKAGE_PIN N19 [get_ports i2c_scl]
+set_property PACKAGE_PIN M21 [get_ports pwm_2]
+set_property PACKAGE_PIN N21 [get_ports pwm_3]
+#set_property PACKAGE_PIN M20
+#set_property PACKAGE_PIN N19
 #set_property PACKAGE_PIN P24
 #set_property PACKAGE_PIN P23
 #set_property PACKAGE_PIN P21
@@ -49,8 +50,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports rx]
 set_property IOSTANDARD LVCMOS33 [get_ports tx]
 set_property IOSTANDARD LVCMOS33 [get_ports pwm_0]
 set_property IOSTANDARD LVCMOS33 [get_ports pwm_1]
-set_property IOSTANDARD LVCMOS33 [get_ports i2c_sda]
-set_property IOSTANDARD LVCMOS33 [get_ports i2c_scl]
+set_property IOSTANDARD LVCMOS33 [get_ports pwm_2]
+set_property IOSTANDARD LVCMOS33 [get_ports pwm_3]
 
 #LCD & TS
 set_property PACKAGE_PIN J25 [get_ports lcd_rst]

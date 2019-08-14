@@ -42,9 +42,13 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define TIMER_ADDR      16'he000   //32'hbfd0_e000
 `define DOT_ADDR        16'hf040   //32'hbfd0_f040 - f05C
 
-`define INTR_ADDR       16'hff00
+`define PWM_CONFR_ADDR  16'hff00
 `define PWM0_ADDR       16'hff14
 `define PWM1_ADDR       16'hff18
+`define PWM2_ADDR       16'hff1c
+`define PWM3_ADDR       16'hff20
+
+`define INTR_ADDR       16'hff00
 
 module confreg(
     aclk,
@@ -115,6 +119,8 @@ module confreg(
     // -- PWM
     pwm0_out,
     pwm1_out,
+    pwm2_out,
+    pwm3_out,
 
     // -- Hypo Interrupt Register
     hypo_intr
@@ -187,9 +193,13 @@ module confreg(
 // -- PWM Modules
     output pwm0_out;
     output pwm1_out;
+    output pwm2_out;
+    output pwm3_out;
 
 reg [31:0] pwm0_compare;
 reg [31:0] pwm1_compare;
+reg [31:0] pwm2_compare;
+reg [31:0] pwm3_compare;
 
 // -- HypoINT Register
     input [31:0] hypo_intr;
@@ -303,9 +313,11 @@ wire [31:0] rdata_d = buf_addr[15:2]         == 14'd0 ? cr00 :
                        buf_addr[15:2]         == 14'd5 ? cr05 :
                        buf_addr[15:2]         == 14'd6 ? cr06 :
                        buf_addr[15:2]         == 14'd7 ? cr07 :
-                       buf_addr[15:0]         == `INTR_ADDR      ? reg_intr       : // Read for int status
                        buf_addr[15:0]         == `PWM0_ADDR      ? pwm0_compare   : // Read for our compare value.
                        buf_addr[15:0]         == `PWM1_ADDR      ? pwm1_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `PWM2_ADDR      ? pwm2_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `PWM3_ADDR      ? pwm3_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `INTR_ADDR      ? reg_intr       : // Read for int status
                        buf_addr[15:0]         == `ORDER_REG_ADDR ? order_addr_reg : 
                        buf_addr[15:0]         == `LED_ADDR       ? led_data       :
                        buf_addr[15:0]         == `LED_RG0_ADDR   ? led_rg0_data   :
@@ -833,6 +845,44 @@ begin
     else if(write_pwm1)
     begin
         pwm1_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM 2
+wire write_pwm2 = w_enter & (buf_addr[15:0]==`PWM2_ADDR);
+PWM pwm1(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm2_compare),
+    .pwm_out(pwm2_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm2_compare <= 32'h0;
+    end
+    else if(write_pwm2)
+    begin
+        pwm2_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM 3
+wire write_pwm3 = w_enter & (buf_addr[15:0]==`PWM3_ADDR);
+PWM pwm1(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm3_compare),
+    .pwm_out(pwm3_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm3_compare <= 32'h0;
+    end
+    else if(write_pwm3)
+    begin
+        pwm3_compare <= s_wdata[31:0];
     end
 end
 
