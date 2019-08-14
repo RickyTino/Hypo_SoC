@@ -1,17 +1,20 @@
 # Vivado temp file
-vivado_xpr/project_1/project_1.cache/
-vivado_xpr/project_1/project_1.hw/
-vivado_xpr/project_1/project_1.ip_user_files/
-vivado_xpr/project_1/project_1.runs/
-vivado_xpr/project_1/project_1.srcs/
-vivado_xpr/project_1/project_1.sim/
-vivado_xpr/project_1/vivado.jou
+vivado_xpr/project-hyposoc_iot/project-hyposoc_iot.cache/
+vivado_xpr/project-hyposoc_iot/project-hyposoc_iot.hw/
+vivado_xpr/project-hyposoc_iot/project-hyposoc_iot.ip_user_files/
+vivado_xpr/project-hyposoc_iot/project-hyposoc_iot.runs/
+vivado_xpr/project-hyposoc_iot/project-hyposoc_iot.srcs/
+vivado_xpr/project-hyposoc_iot/project-hyposoc_iot.sim/
+vivado_xpr/project-hyposoc_iot/vivado.jou
+vivado_xpr/project-hyposoc_iot/vivado.log
 
 # Doc
 doc/AXI4L*/
 doc/MIG/
 doc/Sensor_Kit/
 doc/7Q-TEK_QT18B20/
+doc/PCF8591/
+doc/TFT-LCD/
 
 # Xlnx IP Core
 rtl/Xilinx_IP/

@@ -39,10 +39,15 @@ module soc_up_top(
 
     //------gpio----------------
     inout  [15:0] GPIO16_pins,
+
     input rx,
     output tx,
+
     output pwm_0,
     output pwm_1,
+
+    inout i2c_sda,
+    inout i2c_scl,
 
 
     output [15:0] led,
@@ -643,6 +648,9 @@ wire        mac_int;
 wire [5:0]  int_out;
 wire [5:0]  int_n_i;
 
+wire [31:0] hyposoc_intr;
+assign      hyposoc_intr    = {30'b0, iic2intc_irpt, uart_lite_int};
+
 assign      soc_intc_intr   = {uart_lite_int, uart0_int}; // INTC interrupt input, LSB is the highest priority
 // assign      int_out         = {1'b0, dma_int, nand_int, spi_inta_o, soc_intc_irq, mac_int};
 //                             7      6       5         4           3          2
@@ -684,7 +692,7 @@ axi_intc_0 axi_soc_intc (
 assign EJTAG_TDO = 0;
 
 MangoMIPS_Top cpu_mid(
-.intr           (~int_n_i     ),
+.intr           (int_out      ),
 .aclk           (aclk         ),
 .aresetn        (aresetn      ),
 .m_arid         (m0_arid[3:0] ),
@@ -829,11 +837,47 @@ wire [1:0]  uart_lite_rresp;
 wire        uart_lite_rvalid;
 wire        uart_lite_rready;
 
+// ---- IIC
+// -- WIRE NET TYPE
+wire [8:0]  i2c_awaddr;
+wire        i2c_awvalid;
+wire        i2c_awready;
+
+wire [31:0] i2c_wdata;
+wire [3:0]  i2c_wstrb;
+wire        i2c_wvalid;
+wire        i2c_wready;
+
+wire [1:0]  i2c_bresp;
+wire        i2c_bvalid;
+wire        i2c_bready;
+
+wire [8:0]  i2c_araddr;
+wire        i2c_arvalid;
+wire        i2c_arready;
+
+wire [31:0] i2c_rdata;
+wire [1:0]  i2c_rresp;
+wire        i2c_rvalid;
+wire        i2c_rready;
+
+wire        i2c_sda_i;
+wire        i2c_sda_o;
+wire        i2c_sda_t;
+wire        i2c_scl_i;
+wire        i2c_scl_o;
+wire        i2c_scl_t;
+    // Tri-state inout
+assign i2c_sda = i2c_sda_t ? 1'bz : i2c_sda_o;
+assign i2c_sda_i = i2c_sda;
+assign i2c_scl = i2c_scl_t ? 1'bz : i2c_scl_o;
+assign i2c_scl_i = i2c_scl;
+
 
 // -- Crossbar IP Core
 axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
-  .aclk(aclk),                      // input wire aclk
-  .aresetn(aresetn),                // input wire aresetn
+  .aclk             (aclk               ),  
+  .aresetn          (aresetn            ),   
   
   // Slave interface, connected to the father crossbar Master Interface.
   // Write Address Channel
@@ -884,7 +928,7 @@ axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
   .s_axi_rready     (s_axi3t4l_rready   ),
 
   // Master Interface, connected to the AXI4LITE GPIO IP core.
-  .m_axi_awaddr     ({{23'b0,soc_intc_awaddr},  {28'b0,uart_lite_awaddr},   {23'b0,single_gpio_awaddr}}),
+  .m_axi_awaddr     ({{23'b0,i2c_awaddr},       {23'b0,soc_intc_awaddr},  {28'b0,uart_lite_awaddr},   {23'b0,single_gpio_awaddr}}),
   .m_axi_awlen      (),
   .m_axi_awsize     (),
   .m_axi_awburst    (),
@@ -893,20 +937,20 @@ axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
   .m_axi_awprot     (),
   .m_axi_awregion   (),
   .m_axi_awqos      (),
-  .m_axi_awvalid    ({soc_intc_awvalid,         uart_lite_awvalid,         single_gpio_awvalid    }),
-  .m_axi_awready    ({soc_intc_awready,         uart_lite_awready,         single_gpio_awready    }),
+  .m_axi_awvalid    ({i2c_awvalid,              soc_intc_awvalid,         uart_lite_awvalid,         single_gpio_awvalid    }),
+  .m_axi_awready    ({i2c_awready,              soc_intc_awready,         uart_lite_awready,         single_gpio_awready    }),
 
-  .m_axi_wdata      ({soc_intc_wdata,           uart_lite_wdata,           single_gpio_wdata      }),
-  .m_axi_wstrb      ({soc_intc_wstrb,           uart_lite_wstrb,           single_gpio_wstrb      }),
+  .m_axi_wdata      ({i2c_wdata,                soc_intc_wdata,           uart_lite_wdata,           single_gpio_wdata      }),
+  .m_axi_wstrb      ({i2c_wstrb,                soc_intc_wstrb,           uart_lite_wstrb,           single_gpio_wstrb      }),
   .m_axi_wlast      (),
-  .m_axi_wvalid     ({soc_intc_wvalid,          uart_lite_wvalid,          single_gpio_wvalid     }),
-  .m_axi_wready     ({soc_intc_wready,          uart_lite_wready,          single_gpio_wready     }),
+  .m_axi_wvalid     ({i2c_wvalid,               soc_intc_wvalid,          uart_lite_wvalid,          single_gpio_wvalid     }),
+  .m_axi_wready     ({i2c_wready,               soc_intc_wready,          uart_lite_wready,          single_gpio_wready     }),
 
-  .m_axi_bresp      ({soc_intc_bresp,           uart_lite_bresp,           single_gpio_bresp      }),
-  .m_axi_bvalid     ({soc_intc_bvalid,          uart_lite_bvalid,          single_gpio_bvalid     }),
-  .m_axi_bready     ({soc_intc_bready,          uart_lite_bready,          single_gpio_bready     }),
+  .m_axi_bresp      ({i2c_bresp,                soc_intc_bresp,           uart_lite_bresp,           single_gpio_bresp      }),
+  .m_axi_bvalid     ({i2c_bvalid,               soc_intc_bvalid,          uart_lite_bvalid,          single_gpio_bvalid     }),
+  .m_axi_bready     ({i2c_bready,               soc_intc_bready,          uart_lite_bready,          single_gpio_bready     }),
 
-  .m_axi_araddr     ({{23'b0,soc_intc_araddr},  {28'b0,uart_lite_araddr},  {23'b0,single_gpio_araddr}}),
+  .m_axi_araddr     ({{23'b0,i2c_araddr},       {23'b0,soc_intc_araddr},  {28'b0,uart_lite_araddr},  {23'b0,single_gpio_araddr}}),
   .m_axi_arlen      (),
   .m_axi_arsize     (),
   .m_axi_arburst    (),
@@ -915,15 +959,53 @@ axi4lite_crossbar_0 gpio_axi3t4l_crossbar (
   .m_axi_arprot     (),
   .m_axi_arregion   (),
   .m_axi_arqos      (),
-  .m_axi_arvalid    ({soc_intc_arvalid,         uart_lite_arvalid,         single_gpio_arvalid    }),
-  .m_axi_arready    ({soc_intc_arready,         uart_lite_arready,         single_gpio_arready    }),
+  .m_axi_arvalid    ({i2c_arvalid,              soc_intc_arvalid,         uart_lite_arvalid,         single_gpio_arvalid    }),
+  .m_axi_arready    ({i2c_arready,              soc_intc_arready,         uart_lite_arready,         single_gpio_arready    }),
 
-  .m_axi_rdata      ({soc_intc_rdata,           uart_lite_rdata,           single_gpio_rdata      }),
-  .m_axi_rresp      ({soc_intc_rresp,           uart_lite_rresp,           single_gpio_rresp      }),
-  .m_axi_rlast      ({soc_intc_rvalid,          uart_lite_rvalid,          single_gpio_rvalid     }),
-  .m_axi_rvalid     ({soc_intc_rvalid,          uart_lite_rvalid,          single_gpio_rvalid     }),
-  .m_axi_rready     ({soc_intc_rready,          uart_lite_rready,          single_gpio_rready     })
+  .m_axi_rdata      ({i2c_rdata,                soc_intc_rdata,           uart_lite_rdata,           single_gpio_rdata      }),
+  .m_axi_rresp      ({i2c_rresp,                soc_intc_rresp,           uart_lite_rresp,           single_gpio_rresp      }),
+  .m_axi_rlast      ({i2c_rvalid,               soc_intc_rvalid,          uart_lite_rvalid,          single_gpio_rvalid     }),
+  .m_axi_rvalid     ({i2c_rvalid,               soc_intc_rvalid,          uart_lite_rvalid,          single_gpio_rvalid     }),
+  .m_axi_rready     ({i2c_rready,               soc_intc_rready,          uart_lite_rready,          single_gpio_rready     })
 
+);
+// -- AXI4 LITE IIC IP CORE
+AXI4L_IIC_ADC axi_iic (
+  .s_axi_aclk               (aclk               ),       
+  .s_axi_aresetn            (aresetn            ),   
+
+  .iic2intc_irpt            (iic2intc_irpt      ),  
+
+  .s_axi_awaddr             (i2c_awaddr         ),    
+  .s_axi_awvalid            (i2c_awvalid        ),  
+  .s_axi_awready            (i2c_awready        ),   
+
+  .s_axi_wdata              (i2c_wdata          ),   
+  .s_axi_wstrb              (i2c_wstrb          ),     
+  .s_axi_wvalid             (i2c_wvalid         ),   
+  .s_axi_wready             (i2c_wready         ),   
+
+  .s_axi_bresp              (i2c_bresp          ),      
+  .s_axi_bvalid             (i2c_bvalid         ),   
+  .s_axi_bready             (i2c_bready         ),    
+
+  .s_axi_araddr             (i2c_araddr         ),    
+  .s_axi_arvalid            (i2c_arvalid        ),  
+  .s_axi_arready            (i2c_arready        ), 
+
+  .s_axi_rdata              (i2c_rdata          ),      
+  .s_axi_rresp              (i2c_rresp          ),    
+  .s_axi_rvalid             (i2c_rvalid         ),  
+  .s_axi_rready             (i2c_rready         ),    
+
+  .sda_i                    (i2c_sda_i          ),  
+  .sda_o                    (i2c_sda_o          ),   
+  .sda_t                    (i2c_sda_t          ),   
+  .scl_i                    (i2c_scl_i          ),    
+  .scl_o                    (i2c_scl_o          ),    
+  .scl_t                    (i2c_scl_t          ),     
+
+  .gpo                      ()  
 );
 
 // -- AXI4 LITE UART LITE IP CORE
@@ -1206,7 +1288,10 @@ confreg CONFREG(
 
 // -- PWM0
 .pwm0_out          (pwm_0       ),
-.pwm1_out          (pwm_1       )
+.pwm1_out          (pwm_1       ),
+
+// -- INR
+.hypo_intr         (hyposoc_intr)
 );
 
 //MAC top

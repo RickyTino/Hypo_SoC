@@ -22,6 +22,7 @@ Hypo_SoC以龙芯的SoC_up为基础，对结构进行了微调和优化，并添
     GPIO 16PINS     1fd1_0000 - 1fd1_7fff
     AXI UART LITE   1fd1_8000 - 1df1_8fff
     AXI INTC        1fd1_9000 - 1fd1_9fff
+    AXI IIC         1fd1_a000 - 1fd1_afff
 
 注：DDR3实际大小128MB
 
@@ -82,7 +83,10 @@ LCD控制器的地址空间分为两部分：LCD_RAM与控制寄存器。
   - 从左到右，每列是一个字节，低位在上，高位在下
 - 定时器:      0x1fd0e000 按CPU时钟的频率递增的定时器
 - PWM0:    0x1fd0ff14 写 Compare
+- PWM1:    0x1fd0ff18 写 Compare
+- HYPO INTR:    0x1fd0ff00 写 INTR
 
 ## 四、杂项
 - 原SoC_up使用的是龙芯的AXI_SLAVE模块作为AXI总线桥，已更换为扩展性更好的Xilinx AXI Crossbar IP核
 - 板上频率比起SoC_up提升了一倍，从33MHz提升到了66MHz，使用原有SoC_up的涉及串口的软件（比如PMON、Linux）时，控制台波特率应当改为115200。（除非对软件进行重新适配）
+- PCF8591 IIC 地址:0x90

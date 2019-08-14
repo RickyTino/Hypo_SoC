@@ -41,6 +41,8 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define BTN_STEP_ADDR   16'hf028   //32'hbfd0_f028
 `define TIMER_ADDR      16'he000   //32'hbfd0_e000
 `define DOT_ADDR        16'hf040   //32'hbfd0_f040 - f05C
+
+`define INTR_ADDR       16'hff00
 `define PWM0_ADDR       16'hff14
 `define PWM1_ADDR       16'hff18
 
@@ -112,7 +114,10 @@ module confreg(
 
     // -- PWM
     pwm0_out,
-    pwm1_out
+    pwm1_out,
+
+    // -- Hypo Interrupt Register
+    hypo_intr
 );
     input           aclk;
     input           aresetn;
@@ -185,6 +190,10 @@ module confreg(
 
 reg [31:0] pwm0_compare;
 reg [31:0] pwm1_compare;
+
+// -- HypoINT Register
+    input [31:0] hypo_intr;
+reg [31:0] reg_intr;
 
 //
 reg  [31:0] led_data;
@@ -294,6 +303,7 @@ wire [31:0] rdata_d = buf_addr[15:2]         == 14'd0 ? cr00 :
                        buf_addr[15:2]         == 14'd5 ? cr05 :
                        buf_addr[15:2]         == 14'd6 ? cr06 :
                        buf_addr[15:2]         == 14'd7 ? cr07 :
+                       buf_addr[15:0]         == `INTR_ADDR      ? reg_intr       : // Read for int status
                        buf_addr[15:0]         == `PWM0_ADDR      ? pwm0_compare   : // Read for our compare value.
                        buf_addr[15:0]         == `PWM1_ADDR      ? pwm1_compare   : // Read for our compare value.
                        buf_addr[15:0]         == `ORDER_REG_ADDR ? order_addr_reg : 
@@ -786,6 +796,7 @@ begin
 end
 
 //--------------------------------------{dot}end------------------------//
+// ------------------------------------- PWM -------------------------------------
 // -- PWM 0
 wire write_pwm0 = w_enter & (buf_addr[15:0]==`PWM0_ADDR);
 PWM pwm0(
@@ -822,6 +833,21 @@ begin
     else if(write_pwm1)
     begin
         pwm1_compare <= s_wdata[31:0];
+    end
+end
+
+// ------------------------------------- Hypo INT Register -------------------------------------
+wire write_intr = w_enter & (buf_addr[15:0]==`INTR_ADDR);
+
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        reg_intr <= 32'b0;
+    end
+    else if(write_intr) begin
+        reg_intr <= s_wdata[31:0];
+    end
+    else begin
+        reg_intr <= hypo_intr;
     end
 end
 
