@@ -560,6 +560,8 @@ module hyposoc_iot_top(
     wire                      gpu_s_rlast;
     wire                      gpu_s_rvalid;
     wire                      gpu_s_rready;
+    
+    wire inner_lcd_bl_ctl;
 
     // ------------------------------------- Loongson SoC Interface -------------------------------------
     /*
@@ -1268,6 +1270,8 @@ module hyposoc_iot_top(
     .pwm1_out          (pwm_1       ),
     .pwm2_out          (pwm_2       ),
     .pwm3_out          (pwm_3       ),
+    .lcd_bl_general_ctl(inner_lcd_bl_ctl),
+    .lcd_bl_ctl_o      (lcd_bl_ctr  ),
 
     // -- INR
     .hypo_intr         (hyposoc_intr)
@@ -1840,7 +1844,7 @@ module hyposoc_iot_top(
     .lcd_wr         (lcd_wr             ),
     .lcd_rd         (lcd_rd             ),
     .lcd_data_io    (lcd_data_io        ),
-    .lcd_bl_ctr     (lcd_bl_ctr         ),
+    .lcd_bl_ctr     (inner_lcd_bl_ctl   ),
         
     .ct_int         (ct_int             ),
     .ct_sda         (ct_sda             ),

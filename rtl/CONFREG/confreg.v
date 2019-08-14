@@ -42,7 +42,11 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define TIMER_ADDR      16'he000   //32'hbfd0_e000
 `define DOT_ADDR        16'hf040   //32'hbfd0_f040 - f05C
 
-`define PWM_CONFR_ADDR  16'hff00   // Main PWM Control of the whole ConfReg
+`define PWM_CONFR_ADDR  16'hff00   // Main PWM Control of the whole ConfReg LED
+`define CONFR_ISEL_ADDR 16'hff04   // Confreg Control Signal Select: 0(default) for PWM, 1 for General.
+`define PWM_LCD_BL_ADDR 16'hff08   // LCD Backlight PWM Control
+`define LCD_BLSEL_ADDR  16'hff0c   // LCD Backlight Select: 0(default) for PWM, 1 for General.
+`define UNDEFINED_ADDR  16'hff10
 `define PWM0_ADDR       16'hff14
 `define PWM1_ADDR       16'hff18
 `define PWM2_ADDR       16'hff1c
@@ -121,6 +125,11 @@ module confreg(
     pwm1_out,
     pwm2_out,
     pwm3_out,
+    lcd_bl_general_ctl,     // -- LCD BL control general signal from TFT-LCD Module.
+    lcd_bl_ctl_o,           // -- LCD BL SEL output
+
+
+
 
     // -- Hypo Interrupt Register
     hypo_intr
@@ -196,10 +205,21 @@ module confreg(
     output pwm2_out;
     output pwm3_out;
 
-reg [31:0] pwm0_compare;
-reg [31:0] pwm1_compare;
-reg [31:0] pwm2_compare;
-reg [31:0] pwm3_compare;
+    input  lcd_bl_general_ctl;  // -- LCD BL control general signal from TFT-LCD Module.
+    output reg lcd_bl_ctl_o;    // -- LCD BL SEL output
+
+wire pwm_lcd_bl_ctr;
+wire pwm_confreg_ctl;
+
+reg [31:0]  pwm0_compare;
+reg [31:0]  pwm1_compare;
+reg [31:0]  pwm2_compare;
+reg [31:0]  pwm3_compare;
+reg [31:0]  pwm_lcd_bl_compare;
+reg [31:0]  pwm_confreg_compare;
+reg         reg_confr_isel;
+reg         reg_lcd_blsel;
+reg [15:0]  confreg_ctl_o;
 
 // -- HypoINT Register
     input [31:0] hypo_intr;
@@ -313,6 +333,10 @@ wire [31:0] rdata_d = buf_addr[15:2]         == 14'd0 ? cr00 :
                        buf_addr[15:2]         == 14'd5 ? cr05 :
                        buf_addr[15:2]         == 14'd6 ? cr06 :
                        buf_addr[15:2]         == 14'd7 ? cr07 :
+                       buf_addr[15:0]         == `PWM_CONFR_ADDR ? pwm_confreg_compare  :
+                       buf_addr[15:0]         == `CONFR_ISEL_ADDR? reg_confr_isel :
+                       buf_addr[15:0]         == `PWM_LCD_BL_ADDR? pwm_lcd_bl_compare   :
+                       buf_addr[15:0]         == `LCD_BLSEL_ADDR ? reg_lcd_blsel  :
                        buf_addr[15:0]         == `PWM0_ADDR      ? pwm0_compare   : // Read for our compare value.
                        buf_addr[15:0]         == `PWM1_ADDR      ? pwm1_compare   : // Read for our compare value.
                        buf_addr[15:0]         == `PWM2_ADDR      ? pwm2_compare   : // Read for our compare value.
@@ -423,7 +447,7 @@ end
 //led display
 //led_data[31:0]
 wire write_led = w_enter & (buf_addr[15:0]==`LED_ADDR);
-assign led = led_data[15:0];
+assign led = confreg_ctl_o; // led_data[15:0];
 always @(posedge aclk)
 begin
     if(!aresetn)
@@ -885,6 +909,44 @@ begin
         pwm3_compare <= s_wdata[31:0];
     end
 end
+// -- PWM LCD BACKLIGHT
+wire write_pwm_lcd = w_enter & (buf_addr[15:0]==`PWM_LCD_BL_ADDR);
+PWM pwm_lcd(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm_lcd_bl_compare),
+    .pwm_out(pwm_lcd_bl_ctr)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm_lcd_bl_compare <= 32'h0;
+    end
+    else if(write_pwm_lcd)
+    begin
+        pwm_lcd_bl_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM CONFREG MAIN CONTROL
+wire write_pwm_confreg = w_enter & (buf_addr[15:0]==`PWM_CONFR_ADDR);
+PWM pwm_confreg(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm_confreg_compare),
+    .pwm_out(pwm_confreg_ctl)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm_confreg_compare <= 32'h0;
+    end
+    else if(write_pwm_confreg)
+    begin
+        pwm_confreg_compare <= s_wdata[31:0];
+    end
+end
 
 // ------------------------------------- Hypo INT Register -------------------------------------
 wire write_intr = w_enter & (buf_addr[15:0]==`INTR_ADDR);
@@ -901,43 +963,52 @@ always @(posedge aclk) begin
     end
 end
 
-endmodule
+// ------------------------------------- LCD BackLight Sel -------------------------------------
+wire write_lcd_blsel = w_enter & (buf_addr[15:0]==`LCD_BLSEL_ADDR);
+// Operate reg_lcd_blsel
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        reg_lcd_blsel <= 1'b0;
+    end
+    else if(write_intr) begin
+        reg_lcd_blsel <= s_wdata[0];
+    end
+end
+// MUX
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        lcd_bl_ctl_o <= 1'b0;
+    end
+    else if(reg_lcd_blsel == 1'b1) begin
+        lcd_bl_ctl_o <= lcd_bl_general_ctl;
+    end
+    else if(reg_lcd_blsel == 1'b0) begin
+        lcd_bl_ctl_o <= pwm_lcd_bl_ctr;
+    end
+end
 
-// Module PWM
-//  For 66Mhz - a 50Hz PWM signal is 1,320,000 counter.
-//  counter = 0.02 * freq
-module PWM (
-	input clk,
-	input rst_n,
-	input [31:0] compare,
-	output pwm_out
-);
-	reg [31:0] counter;
-    reg [31:0] counter_syn;
-	reg pwm_d;
-	
-	assign pwm_out = pwm_d;
-	
-	always@(posedge clk) begin
-        // reset
-		if(!rst_n) counter <= 0;
-        // keep counting until 1,320,000
-		else if(counter < 32'd1_319_999) counter <= counter + 1;
-        // at last reset the counter.
-		else counter <= 0;
-	end
-
-    always@(posedge clk) begin
-        counter_syn <= counter;
-	end
-	
-    // PWM standard.
-	always@(posedge clk) begin
-		if(!rst_n) pwm_d <= 0;
-		else if(compare > counter_syn)
-			pwm_d <= 1;
-		else
-			pwm_d <= 0;
-	end
+// ------------------------------------- ConfReg Control Signal Sel -------------------------------------
+wire write_confr_isel = w_enter & (buf_addr[15:0]==`CONFR_ISEL_ADDR);
+// Operate reg_lcd_blsel
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        reg_confr_isel <= 1'b0;
+    end
+    else if(write_intr) begin
+        reg_confr_isel <= s_wdata[0];
+    end
+end
+// MUX
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        confreg_ctl_o <= 16'b0;
+    end
+    else if(reg_lcd_blsel == 1'b1) begin
+        confreg_ctl_o <= led_data[15:0];
+    end
+    else if(reg_lcd_blsel == 1'b0) begin
+        confreg_ctl_o <= {16{pwm_confreg_ctl}};
+    end
+end
 
 endmodule
