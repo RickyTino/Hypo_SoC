@@ -42,7 +42,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 `define TIMER_ADDR      16'he000   //32'hbfd0_e000
 `define DOT_ADDR        16'hf040   //32'hbfd0_f040 - f05C
 
-`define PWM_CONFR_ADDR  16'hff00
+`define PWM_CONFR_ADDR  16'hff00   // Main PWM Control of the whole ConfReg
 `define PWM0_ADDR       16'hff14
 `define PWM1_ADDR       16'hff18
 `define PWM2_ADDR       16'hff1c

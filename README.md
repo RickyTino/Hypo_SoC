@@ -1,101 +1,16 @@
-# Hypothetic SoC IoT 接口说明
+# Hypothetic SoC -  IoT 
 
-Hypo_SoC以龙芯的SoC_up为基础，对结构进行了微调和优化，并添加了自行开发的LCD及触摸屏控制器。  
-作者：Hypothetic CPU team - HITWH NSCSCC  
+Hypothetic SoC -  IoT 以龙芯的 SoC_up为基础，对结构进行了专注于嵌入式物联网方面的重构以及优化，使得 SoC 成为一个完整的嵌入式系统，能够接入IoT边缘设备，并接收、发送、处理相关数据信息。
 
-**本文档描述均基于原有SoC_up的架构上作出的调整与变更，关于SoC_up请参见"soc_up介绍_v0.01.pdf"。**
+## Features
 
-## 一、地址空间分配
+- 稳定运行 Pmon 以及定制的 Linux 2.6.32 内核；
+- 增加了 RickyTino 开发的 TFT-LCD 显示屏驱动模块；
+- 增加了 ArHShRn 开发的 PWM_CNT 计数型脉冲调制模块；
+- 增加了 Xlnx Interrupt Controller 以及 Confreg Integrated Interrupt Controller，并可静态配置 intr 是否接入 CauseIP 或者接入 Confreg INT Register，值得注意的是，两种接入方法均采用轮询任务方式；
+- 引用了 FPGA 芯片扩展输入输出 EXT_IO，启用了开发板右侧板载 40pin 扩展 IO 接口，全称 Hypothetic GPIO HQ2 Header (abbr. GHQ2)，包含两个 Bank (Bank0 对应 FPGA_EXT_IO 0-15，Bank1 对应 FPGA_EXT_IO_16-31)
+- 于 GHQ2 Bank0 配置 16 个三态双向串行数据线，其中 FPGA_EXT_IO14-15 被以软件实现的 Simple I2C Emulator 分时占用，以与基于 I2C 协议的设备进行交流；
+- 于 GHQ2 Bank1 配置 2 个 UART Lite 的数据线以及 4 个可控 PWM_CNT 模块的单项输出数据线
+- 增加总共 6 个可控 PWM_CNT 模块，其中 4 个挂载于 GHQ2 上，其中 1 个作为 TFT-LCD 屏的非 8080 接口背光亮度控制，剩余 1 个作为 Loongson ConfReg 的总控（仅适用于 CONFREG 种的显示输出设备，例如 LED、数码管等）
 
-目前的地址空间分配：
-
-```
-[Module]        [Physical Address]          [Size]      [Width]
-GPU             1fa0_0000 - 1faf_ffff       1MB         20
-SPI Flash       1fc0_0000 - 1fcf_ffff       1MB         20
-Confreg         1fd0_0000 - 1fd0_ffff       64KB        16
-SPI Ctrl        1fe8_0000 - 1fe8_ffff       64KB        16
-MAC             1ff0_0000 - 1ff0_ffff       64KB        16
-UART            1fe4_0000 - 1fe4_3fff       16KB        14
-Nand Flash      1fe7_8000 - 1fe7_bfff       16KB        14
-DDR3[1]         0000_0000 - 17ff_ffff       ----        --
-DDR3[2]         2000_0000 - ffff_ffff       ----        --
-
-GPIO 16PINS     1fd1_0000 - 1fd1_7fff
-AXI UART LITE   1fd1_8000 - 1df1_8fff
-AXI INTC        1fd1_9000 - 1fd1_9fff
-AXI IIC         1fd1_a000 - 1fd1_afff
-```
-
-注：DDR3实际大小128MB
-
-## 二、GPU
-
-GPU为自行开发模块，包含三部分：AXI转BRAM接口、LCD控制器与触摸屏控制器
-
-### 1. LCD控制器
-
-板上LCD屏大小为800*480，共384000像素，屏幕颜色模式为16位色，格式为(R5, G6, B5)，坐标原点默认左上角（可配置）。对外使用异步8080并口进行数据读写。更多参数详见"ATK-4.3' TFTLCD 模块用户手册_V1.2.pdf"。
-
-由于8080接口的信号较为复杂，为了简化LCD的读写时序并提高读写效率，该LCD控制器实现了一个双口RAM，采用类似于DMA的状态机方式对LCD进行初始化并将显示数据循环地由RAM中写入LCD屏中。由于LCD_RAM是双口RAM，DMA和来自总线的访存操作是可以同时进行的。如此一来，CPU对LCD屏的操作就简化成了普通的访存操作，并可任意访问每一个像素。
-
-LCD控制器的地址空间分为两部分：LCD_RAM与控制寄存器。
-
-- LCD_RAM：
-  - 地址空间为 1fa0_0000 - 1fab_ffff。
-  - 实际有效的地址范围为 1fa0_0000 - 1fab_b7ff，正好2字节对应1像素
-  - 可以8/16/32位读写，建议16位读写
-- 控制寄存器：
-  - 地址空间分配为 1fab_c000 - 1fab_ffff
-  - 寄存器c000: 0位开启背光
-  - 目前只有一个控制寄存器，其他用途待定
-
-### 2. 触摸屏控制器
-
-触摸屏的大小与LCD相同，坐标方式也是相同的，触点扫描频率100Hz，最多支持5点触控。对外使用I2C接口，支持中断方式和轮询方式。更多参数详见"ATK-4.3' TFTLCD 模块用户手册_V1.2.pdf"。
-
-由于I2C接口时钟频率不能高于200kHz，总线周期较长，如果使用软件方式控制I2C接口，则CPU时间资源容易浪费在等待上。因此该触摸屏控制器采用类似于DMA的方式，使用状态机对IIC接口进行初始化和读写控制，并将读到的结果存储在寄存器中，供总线访问。
-
-触摸屏的地址空间为 1fac_0000 - 1faf_ffff，其中[5:2]位是有效地址。对应16个32位数。具体对应关系如下：
-
-- 00: 有效触点个数
-- 04: 触点1 x坐标
-- 08: 触点1 y坐标
-- 0C: 触点1 size
-- 10: 触点2 x坐标
-- 14: 触点2 y坐标
-- 18: 触点2 size
-- 1C: 触点3 x坐标
-- 20: 触点3 y坐标
-- 24: 触点3 size
-- 28: 触点4 x坐标
-- 2C: 触点4 y坐标
-- 30: 触点4 size
-- 34: 触点5 x坐标
-- 38: 触点5 y坐标
-- 3C: 触点5 size
-
-注：有效触点必定是靠前的触点，如个数为3时，有效的必定是点1-3；个数为1时，有效的只有点1；依此类推。
-
-## 三、GPIO
-
-为了与SoC_up保持兼容，GPIO寄存器全都是32位，包括后续添加的。列举如下：
-
-- 16位单色LED: 0x1fd0f000
-- 2个双色LED:  0x1fd0f004 低2位控制: 0位为绿，1位为红
-- 8个数码管:   0x1fd0f010 直接显示16进制32位数
-- 8位拨码开关: 0x1fd0f020 低8位有效，上为0，下为1
-- 16个按键:    0x1fd0f024 低16位有效，左上角按键为0，类推
-- 单步按键:    0x1fd0f028 高电平有效
-- 8x8点阵:     0x1fd0f040 - f05C, 8个低8位有效的32位寄存器，
-  - 从左到右，每列是一个字节，低位在上，高位在下
-- 定时器:      0x1fd0e000 按CPU时钟的频率递增的定时器
-- PWM0:    0x1fd0ff14 写 Compare
-- PWM1:    0x1fd0ff18 写 Compare
-- HYPO INTR:    0x1fd0ff00 写 INTR
-
-## 四、杂项
-
-- 原SoC_up使用的是龙芯的AXI_SLAVE模块作为AXI总线桥，已更换为扩展性更好的Xilinx AXI Crossbar IP核
-- 板上频率比起SoC_up提升了一倍，从33MHz提升到了66MHz，使用原有SoC_up的涉及串口的软件（比如PMON、Linux）时，控制台波特率应当改为115200。（除非对软件进行重新适配）
-- PCF8591 IIC 地址:0x90
+作者：Hypothetic CPU team - HITWH NSCSCC

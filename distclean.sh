@@ -72,7 +72,7 @@ cd $WORKDIR/rtl/Xilinx_IP/axi_crossbar_soc
 rm -rf `ls -l | grep -v .xci | awk '{print $9}'`
 
 ## CPU XLNX IP
-echo "_>  (2/3) Cleaning CPU XLNX IP Core files..."
+echo "_>  (3/3) Cleaning CPU XLNX IP Core files..."
 ##  BUS INTERFACE
 cd $WORKDIR/rtl/CPU/Xilinx_IP/Bus_Interface
 rm -rf `ls -l | grep -v .xci | awk '{print $9}'`
@@ -82,3 +82,7 @@ rm -rf `ls -l | grep -v .xci | awk '{print $9}'`
 ##  ICACHE RAM
 cd $WORKDIR/rtl/CPU/Xilinx_IP/ICache_Ram_IP
 rm -rf `ls -l | grep -v .xci | awk '{print $9}'`
+
+echo "_>  Done. "
+echo "_>  Will exit in 1 sec. "
+sleep 1s
