@@ -31,16 +31,28 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --------------------------------------------------------------------------------
 ------------------------------------------------------------------------------*/
 
-`define ORDER_REG_ADDR 16'h1160   //32'hbfd0_1160
-`define LED_ADDR       16'hf000   //32'hbfd0_f000 
-`define LED_RG0_ADDR   16'hf004   //32'hbfd0_f004 
-`define LED_RG1_ADDR   16'hf008   //32'hbfd0_f008 
-`define NUM_ADDR       16'hf010   //32'hbfd0_f010 
-`define SWITCH_ADDR    16'hf020   //32'hbfd0_f020 
-`define BTN_KEY_ADDR   16'hf024   //32'hbfd0_f024
-`define BTN_STEP_ADDR  16'hf028   //32'hbfd0_f028
-`define TIMER_ADDR     16'he000   //32'hbfd0_e000
-`define DOT_ADDR       16'hf040   //32'hbfd0_f040 - f05C
+`define ORDER_REG_ADDR  16'h1160   //32'hbfd0_1160
+`define LED_ADDR        16'hf000   //32'hbfd0_f000 
+`define LED_RG0_ADDR    16'hf004   //32'hbfd0_f004 
+`define LED_RG1_ADDR    16'hf008   //32'hbfd0_f008 
+`define NUM_ADDR        16'hf010   //32'hbfd0_f010 
+`define SWITCH_ADDR     16'hf020   //32'hbfd0_f020 
+`define BTN_KEY_ADDR    16'hf024   //32'hbfd0_f024
+`define BTN_STEP_ADDR   16'hf028   //32'hbfd0_f028
+`define TIMER_ADDR      16'he000   //32'hbfd0_e000
+`define DOT_ADDR        16'hf040   //32'hbfd0_f040 - f05C
+
+`define PWM_CONFR_ADDR  16'hff00   // Main PWM Control of the whole ConfReg LED
+`define CONFR_ISEL_ADDR 16'hff04   // Confreg Control Signal Select: 0(default) for PWM, 1 for General.
+`define PWM_LCD_BL_ADDR 16'hff08   // LCD Backlight PWM Control
+`define LCD_BLSEL_ADDR  16'hff0c   // LCD Backlight Select: 0(default) for PWM, 1 for General.
+`define UNDEFINED_ADDR  16'hff10
+`define PWM0_ADDR       16'hff14
+`define PWM1_ADDR       16'hff18
+`define PWM2_ADDR       16'hff1c
+`define PWM3_ADDR       16'hff20
+
+`define INTR_ADDR       16'hff00
 
 module confreg(
     aclk,
@@ -106,7 +118,21 @@ module confreg(
     switch,
     btn_key_col,
     btn_key_row,
-    btn_step
+    btn_step,
+
+    // -- PWM
+    pwm0_out,
+    pwm1_out,
+    pwm2_out,
+    pwm3_out,
+    lcd_bl_general_ctl,     // -- LCD BL control general signal from TFT-LCD Module.
+    lcd_bl_ctl_o,           // -- LCD BL SEL output
+
+
+
+
+    // -- Hypo Interrupt Register
+    hypo_intr
 );
     input           aclk;
     input           aresetn;
@@ -173,6 +199,32 @@ module confreg(
     input      [3 :0] btn_key_row;
     input      [1 :0] btn_step;
 
+// -- PWM Modules
+    output pwm0_out;
+    output pwm1_out;
+    output pwm2_out;
+    output pwm3_out;
+
+    input  lcd_bl_general_ctl;  // -- LCD BL control general signal from TFT-LCD Module.
+    output reg lcd_bl_ctl_o;    // -- LCD BL SEL output
+
+wire pwm_lcd_bl_ctr;
+wire pwm_confreg_ctl;
+
+reg [31:0]  pwm0_compare;
+reg [31:0]  pwm1_compare;
+reg [31:0]  pwm2_compare;
+reg [31:0]  pwm3_compare;
+reg [31:0]  pwm_lcd_bl_compare;
+reg [31:0]  pwm_confreg_compare;
+reg         reg_confr_isel;
+reg         reg_lcd_blsel;
+reg [15:0]  confreg_ctl_o;
+
+// -- HypoINT Register
+    input [31:0] hypo_intr;
+reg [31:0] reg_intr;
+
 //
 reg  [31:0] led_data;
 reg  [31:0] led_rg0_data;
@@ -183,6 +235,7 @@ wire [31:0] btn_key_data;
 wire [31:0] btn_step_data;
 reg  [31:0] timer;
 reg  [ 7:0] dot_data [7:0];
+reg  [31:0] pwm_ct;
 
 reg [31:0] cr00,cr01,cr02,cr03,cr04,cr05,cr06,cr07;
 reg busy,write,R_or_W;
@@ -280,6 +333,15 @@ wire [31:0] rdata_d = buf_addr[15:2]         == 14'd0 ? cr00 :
                        buf_addr[15:2]         == 14'd5 ? cr05 :
                        buf_addr[15:2]         == 14'd6 ? cr06 :
                        buf_addr[15:2]         == 14'd7 ? cr07 :
+                       buf_addr[15:0]         == `PWM_CONFR_ADDR ? pwm_confreg_compare  :
+                       buf_addr[15:0]         == `CONFR_ISEL_ADDR? reg_confr_isel :
+                       buf_addr[15:0]         == `PWM_LCD_BL_ADDR? pwm_lcd_bl_compare   :
+                       buf_addr[15:0]         == `LCD_BLSEL_ADDR ? reg_lcd_blsel  :
+                       buf_addr[15:0]         == `PWM0_ADDR      ? pwm0_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `PWM1_ADDR      ? pwm1_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `PWM2_ADDR      ? pwm2_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `PWM3_ADDR      ? pwm3_compare   : // Read for our compare value.
+                       buf_addr[15:0]         == `INTR_ADDR      ? reg_intr       : // Read for int status
                        buf_addr[15:0]         == `ORDER_REG_ADDR ? order_addr_reg : 
                        buf_addr[15:0]         == `LED_ADDR       ? led_data       :
                        buf_addr[15:0]         == `LED_RG0_ADDR   ? led_rg0_data   :
@@ -385,7 +447,7 @@ end
 //led display
 //led_data[31:0]
 wire write_led = w_enter & (buf_addr[15:0]==`LED_ADDR);
-assign led = led_data[15:0];
+assign led = confreg_ctl_o; // led_data[15:0];
 always @(posedge aclk)
 begin
     if(!aresetn)
@@ -770,4 +832,183 @@ begin
 end
 
 //--------------------------------------{dot}end------------------------//
+// ------------------------------------- PWM -------------------------------------
+// -- PWM 0
+wire write_pwm0 = w_enter & (buf_addr[15:0]==`PWM0_ADDR);
+PWM pwm0(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm0_compare),
+    .pwm_out(pwm0_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm0_compare <= 32'h0;
+    end
+    else if(write_pwm0)
+    begin
+        pwm0_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM 1
+wire write_pwm1 = w_enter & (buf_addr[15:0]==`PWM1_ADDR);
+PWM pwm1(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm1_compare),
+    .pwm_out(pwm1_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm1_compare <= 32'h0;
+    end
+    else if(write_pwm1)
+    begin
+        pwm1_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM 2
+wire write_pwm2 = w_enter & (buf_addr[15:0]==`PWM2_ADDR);
+PWM pwm2(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm2_compare),
+    .pwm_out(pwm2_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm2_compare <= 32'h0;
+    end
+    else if(write_pwm2)
+    begin
+        pwm2_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM 3
+wire write_pwm3 = w_enter & (buf_addr[15:0]==`PWM3_ADDR);
+PWM pwm3(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm3_compare),
+    .pwm_out(pwm3_out)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm3_compare <= 32'h0;
+    end
+    else if(write_pwm3)
+    begin
+        pwm3_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM LCD BACKLIGHT
+wire write_pwm_lcd = w_enter & (buf_addr[15:0]==`PWM_LCD_BL_ADDR);
+PWM pwm_lcd(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm_lcd_bl_compare),
+    .pwm_out(pwm_lcd_bl_ctr)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm_lcd_bl_compare <= 32'h0;
+    end
+    else if(write_pwm_lcd)
+    begin
+        pwm_lcd_bl_compare <= s_wdata[31:0];
+    end
+end
+// -- PWM CONFREG MAIN CONTROL
+wire write_pwm_confreg = w_enter & (buf_addr[15:0]==`PWM_CONFR_ADDR);
+PWM pwm_confreg(
+    .clk(aclk),
+    .rst_n(aresetn),
+    .compare(pwm_confreg_compare),
+    .pwm_out(pwm_confreg_ctl)
+);
+always @(posedge aclk)
+begin
+    if(!aresetn)
+    begin
+        pwm_confreg_compare <= 32'h0;
+    end
+    else if(write_pwm_confreg)
+    begin
+        pwm_confreg_compare <= s_wdata[31:0];
+    end
+end
+
+// ------------------------------------- Hypo INT Register -------------------------------------
+wire write_intr = w_enter & (buf_addr[15:0]==`INTR_ADDR);
+
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        reg_intr <= 32'b0;
+    end
+    else if(write_intr) begin
+        reg_intr <= s_wdata[31:0];
+    end
+    else begin
+        reg_intr <= hypo_intr;
+    end
+end
+
+// ------------------------------------- LCD BackLight Sel -------------------------------------
+wire write_lcd_blsel = w_enter & (buf_addr[15:0]==`LCD_BLSEL_ADDR);
+// Operate reg_lcd_blsel
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        reg_lcd_blsel <= 1'b0;
+    end
+    else if(write_intr) begin
+        reg_lcd_blsel <= s_wdata[0];
+    end
+end
+// MUX
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        lcd_bl_ctl_o <= 1'b0;
+    end
+    else if(reg_lcd_blsel == 1'b1) begin
+        lcd_bl_ctl_o <= lcd_bl_general_ctl;
+    end
+    else if(reg_lcd_blsel == 1'b0) begin
+        lcd_bl_ctl_o <= pwm_lcd_bl_ctr;
+    end
+end
+
+// ------------------------------------- ConfReg Control Signal Sel -------------------------------------
+wire write_confr_isel = w_enter & (buf_addr[15:0]==`CONFR_ISEL_ADDR);
+// Operate reg_lcd_blsel
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        reg_confr_isel <= 1'b0;
+    end
+    else if(write_intr) begin
+        reg_confr_isel <= s_wdata[0];
+    end
+end
+// MUX
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        confreg_ctl_o <= 16'b0;
+    end
+    else if(reg_lcd_blsel == 1'b1) begin
+        confreg_ctl_o <= led_data[15:0];
+    end
+    else if(reg_lcd_blsel == 1'b0) begin
+        confreg_ctl_o <= {16{pwm_confreg_ctl}};
+    end
+end
+
 endmodule
